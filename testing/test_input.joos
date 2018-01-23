@@ -1,0 +1,12 @@
+root: (Root object A){
+	array : [
+		(Sub object B-type 1) {
+			leading edge thickness: 0.04,
+			a1: 12
+		},
+		(Sub object B-type 2) {
+			leading edge thickness: 0.05,
+			a2: 12
+		}
+	]
+}
