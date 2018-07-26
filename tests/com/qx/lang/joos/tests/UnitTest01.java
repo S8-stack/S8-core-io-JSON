@@ -9,9 +9,18 @@ import com.qx.lang.joos.engine.JOOS_Engine;
 import com.qx.lang.joos.tests.example.MyRootObjectA;
 
 
+/**
+ * 
+ * @author pc
+ *
+ */
 public class UnitTest01 {
 	
-	
+	/**
+	 * 
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception{
 
 		
@@ -29,11 +38,7 @@ public class UnitTest01 {
 		writer.flush();
 		
 		
-		System.out.println("\ndone: "+time/1e6);
+		System.out.println("\ndone: "+time/1e6+ " ms");
 	}
-	
-
-
-
-	
+		
 }
