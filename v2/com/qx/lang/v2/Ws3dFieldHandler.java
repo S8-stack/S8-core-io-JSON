@@ -1,9 +1,9 @@
 package com.qx.lang.v2;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 import com.qx.lang.v2.annotation.WebScriptField;
-import com.sun.xml.internal.bind.v2.schemagen.xmlschema.List;
 
 
 
