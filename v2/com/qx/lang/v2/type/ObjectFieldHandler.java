@@ -22,8 +22,8 @@ public class ObjectFieldHandler extends FieldHandler {
 	}
 
 	@Override
-	public Sort getSort() {
-		return Sort.OBJECT;
+	public ScopeType getSort() {
+		return ScopeType.OBJECT;
 	}
 
 	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {

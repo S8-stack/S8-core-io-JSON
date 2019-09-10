@@ -9,7 +9,7 @@ import com.qx.lang.v2.annotation.WebScriptField;
 
 public abstract class FieldHandler {
 	
-	public enum Sort {
+	public enum ScopeType {
 		PRIMITIVE, OBJECT, PRIMITIVES_ARRAY, OBJECTS_ARRAY;
 	}
 	
@@ -55,7 +55,7 @@ public abstract class FieldHandler {
 	public abstract Class<?> getSubType();
 
 
-	public abstract Sort getSort();
+	public abstract ScopeType getSort();
 
 	/**
 	 * 

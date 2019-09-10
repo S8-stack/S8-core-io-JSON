@@ -28,7 +28,7 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	}
 	
 	@Override
-	public Sort getSort() {
-		return Sort.PRIMITIVE;
+	public ScopeType getSort() {
+		return ScopeType.PRIMITIVE;
 	}
 }

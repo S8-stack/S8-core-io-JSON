@@ -34,7 +34,7 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 	}
 
 	@Override
-	public Sort getSort() {
-		return Sort.OBJECTS_ARRAY;
+	public ScopeType getSort() {
+		return ScopeType.OBJECTS_ARRAY;
 	}
 }

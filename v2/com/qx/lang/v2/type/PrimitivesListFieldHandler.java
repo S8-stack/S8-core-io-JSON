@@ -1,10 +1,15 @@
 package com.qx.lang.v2.type;
 
-import java.util.List;
-
 public abstract class PrimitivesListFieldHandler extends FieldHandler {
 
-	public abstract void set(Object object, List<String> values) throws IllegalArgumentException, IllegalAccessException;
+	/**
+	 * 
+	 * @param object
+	 * @param values the array of values
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 */
+	public abstract void set(Object object, Object values) throws IllegalArgumentException, IllegalAccessException;
 
 
 }

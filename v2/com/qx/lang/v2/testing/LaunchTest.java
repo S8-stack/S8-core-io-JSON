@@ -32,7 +32,5 @@ public class LaunchTest {
 		catch (Ws3dParsingException e) {
 			e.printStackTrace();
 		}
-		
 	}
-
 }

@@ -23,7 +23,7 @@ public class Ws3dParser {
 
 	protected State state;
 
-	private Stack<ParsingHandle> stack;
+	private Stack<ParsingScope> scopes;
 
 
 	public Ws3dParser(Ws3dContext context, StreamReader reader) {
@@ -45,9 +45,9 @@ public class Ws3dParser {
 	 * @throws Exception
 	 */
 	public Object parse() throws Ws3dParsingException, IOException {
-		stack = new Stack<>();
-		RootParsingHandle rootHandle = new RootParsingHandle();
-		stack.push(rootHandle);
+		scopes = new Stack<>();
+		RootScope rootHandle = new RootScope();
+		scopes.push(rootHandle);
 		while(state!=null){
 			try {
 				state.parse();
@@ -87,30 +87,30 @@ public class Ws3dParser {
 		public void parse() throws Ws3dParsingException, IOException {
 			reader.readNext();
 
-			String fieldName = reader.until(new char[]{':', '}', ']'}, null, null);
-			System.out.println("[XML_Parser] read header: "+fieldName);
+			String declarator = reader.until(new char[]{':', '}', ']'}, null, null);
+			System.out.println("[XML_Parser] read header: "+declarator);
 
 			char current = reader.getCurrentChar();
 			if(current==':'){
 				// acquire selected fieldHandler as new setter
-				Setter setter = stack.peek().getSetter(fieldName);
+				ParsingScope scope = scopes.peek().enter(declarator);
 
-				switch(setter.getSort()){
+				switch(scope.getType()){
 
 				case PRIMITIVE:
-					state = new ReadPrimitive((PrimitiveSetter) setter);	
+					state = new ReadPrimitive((PrimitiveScope) scope);	
 					break;
 
 				case PRIMITIVES_ARRAY:
-					state = new ReadPrimitivesList((PrimitivesListSetter) setter);
+					state = new ReadPrimitivesList((PrimitivesArrayScope) scope);
 					break;
 
 				case OBJECT:
-					state = new ReadObject((ObjectSetter) setter);
+					state = new ReadObject((ObjectScope) scope);
 					break;
 
 				case OBJECTS_ARRAY:
-					state = new ReadObjectsList((ObjectsArraySetter) setter);
+					state = new ReadObjectsList((ObjectsArrayScope) scope);
 					break;
 				}		
 			}
@@ -123,11 +123,11 @@ public class Ws3dParser {
 
 	private class ReadPrimitive extends State {
 
-		private PrimitiveSetter setter;
+		private PrimitiveScope scope;
 
-		public ReadPrimitive(PrimitiveSetter setter) {
+		public ReadPrimitive(PrimitiveScope scope) {
 			super();
-			this.setter = setter;
+			this.scope = scope;
 		}
 
 		@Override
@@ -135,8 +135,9 @@ public class Ws3dParser {
 			reader.readNext();
 			String value = reader.until(new char[]{',', '}'}, null, null);
 			try{
-				setter.set(value);
-			} catch (Exception e) {
+				scope.define(value);
+			} 
+			catch (Exception e) {
 				throw new Ws3dParsingException(reader.line, reader.column, "Cannot set Object due to "+e.getMessage());
 			}
 			char c = reader.getCurrentChar();
@@ -151,11 +152,11 @@ public class Ws3dParser {
 
 	private class ReadObject extends State {
 
-		private ObjectSetter setter;
+		private ObjectScope scope;
 
-		public ReadObject(ObjectSetter setter) {
+		public ReadObject(ObjectScope scope) {
 			super();
-			this.setter = setter;
+			this.scope = scope;
 		}
 
 		@Override
@@ -172,14 +173,14 @@ public class Ws3dParser {
 			if(typeHandler==null){
 				throw new Ws3dParsingException("Unknow type: "+typeName);
 			}
-			ObjectParsingHandle handle = new ObjectParsingHandle(typeHandler);
-
-			setter.set(handle.object);
-			stack.push(handle);
 
 			// check type declaration start sequence
 			reader.readNext();
 			reader.check('{');
+
+			scope.define(typeHandler);
+
+			scopes.push(scope);
 
 			state = new ReadDeclaration();
 		}
@@ -187,51 +188,72 @@ public class Ws3dParser {
 
 	private class ReadPrimitivesList extends State {
 
-		private PrimitivesListSetter setter;
+		private PrimitivesArrayScope scope;
 
-		public ReadPrimitivesList(PrimitivesListSetter setter) {
+		public ReadPrimitivesList(PrimitivesArrayScope scope) {
 			super();
-			this.setter = setter;
+			this.scope = scope;
 		}
-		
+
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 
-			PrimitivesListParsingHandle handle = new PrimitivesListParsingHandle(setter);
-			stack.push(handle);
+			scopes.push(scope);
+
+			// check type declaration start sequence
+			reader.readNext();
+			reader.check('(');
+
+			reader.readNext();
+			String lengthDeclaration = reader.until(new char[]{')'}, null, new char[]{'}', '{', '-', '[', ']'});
+
+			int length = Integer.valueOf(lengthDeclaration);
 
 			// check type declaration start sequence
 			reader.readNext();
 			reader.check('[');
+
+			scope.define(length);
+
+			scopes.push(scope);
+
 
 			state = new ReadDeclaration();
 		}
 	};
 
 	private class ReadObjectsList extends State {
-		
-		private ObjectsArraySetter setter;
-		
-		public ReadObjectsList(ObjectsArraySetter setter) {
+
+		private ObjectsArrayScope scope;
+
+		public ReadObjectsList(ObjectsArrayScope scope) {
 			super();
-			this.setter = setter;
+			this.scope = scope;
 		}
 
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 
-			ObjectsListParsingHandle handle = new ObjectsListParsingHandle(setter);
-			stack.push(handle);
+			// check type declaration start sequence
+			reader.readNext();
+			reader.check('(');
+
+			reader.readNext();
+			String lengthDeclaration = reader.until(new char[]{')'}, null, new char[]{'}', '{', '-', '[', ']'});
+
+			int length = Integer.valueOf(lengthDeclaration);
 
 			// check type declaration start sequence
 			reader.readNext();
 			reader.check('[');
 
+			scope.define(length);
+
+			scopes.push(scope);
+
 			state = new ReadDeclaration();
 		}
 	};
-
-
 
 
 
@@ -241,9 +263,9 @@ public class Ws3dParser {
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 			char c = reader.getCurrentChar();
-			if((stack.peek().isList() && c==']')||(!stack.peek().isList() && c=='}')){
-				stack.pop().close();
-				if(stack.size()>1){
+			if(scopes.peek().isClosedBy(c)){
+				scopes.pop();
+				if(scopes.size()>1){
 					reader.readNext();
 					if(reader.isOneOf(']', '}')){
 						state = close; // keep closing

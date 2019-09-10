@@ -15,7 +15,7 @@ public class NewType {
 	@WebScriptField(name="sub")
 	public NewType2 nt2;
 	
-	@WebScriptField(name="others")
+	@WebScriptField(name="array")
 	public NewType2[] array;
 	
 }
