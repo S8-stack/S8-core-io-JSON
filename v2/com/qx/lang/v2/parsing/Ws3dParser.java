@@ -25,14 +25,13 @@ public class Ws3dParser {
 
 	private Stack<ParsingHandle> stack;
 
-	private Setter setter;
 
 	public Ws3dParser(Ws3dContext context, StreamReader reader) {
 		super();
 		this.reader = reader;
 		//rootBuilder = new RootParsedElement(context);
-		
-		state = readDeclaration;
+
+		state = new ReadDeclaration();
 		this.context = context;
 	}
 
@@ -82,7 +81,7 @@ public class Ws3dParser {
 	/**
 	 * read doc header
 	 */
-	private State readDeclaration = new State() {
+	private class ReadDeclaration extends State {
 
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
@@ -94,24 +93,24 @@ public class Ws3dParser {
 			char current = reader.getCurrentChar();
 			if(current==':'){
 				// acquire selected fieldHandler as new setter
-				setter = stack.peek().getSetter(fieldName);
+				Setter setter = stack.peek().getSetter(fieldName);
 
 				switch(setter.getSort()){
 
 				case PRIMITIVE:
-					state = readPrimitive;	
+					state = new ReadPrimitive((PrimitiveSetter) setter);	
 					break;
 
 				case PRIMITIVES_ARRAY:
-					state = readPrimitivesList;
+					state = new ReadPrimitivesList((PrimitivesListSetter) setter);
 					break;
 
 				case OBJECT:
-					state = readObject;
+					state = new ReadObject((ObjectSetter) setter);
 					break;
 
 				case OBJECTS_ARRAY:
-					state = readObjectsList;
+					state = new ReadObjectsList((ObjectsArraySetter) setter);
 					break;
 				}		
 			}
@@ -122,20 +121,27 @@ public class Ws3dParser {
 	};
 
 
-	private State readPrimitive = new State() {
+	private class ReadPrimitive extends State {
+
+		private PrimitiveSetter setter;
+
+		public ReadPrimitive(PrimitiveSetter setter) {
+			super();
+			this.setter = setter;
+		}
 
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 			reader.readNext();
 			String value = reader.until(new char[]{',', '}'}, null, null);
 			try{
-				((PrimitiveSetter) setter).set(value);
+				setter.set(value);
 			} catch (Exception e) {
 				throw new Ws3dParsingException(reader.line, reader.column, "Cannot set Object due to "+e.getMessage());
 			}
 			char c = reader.getCurrentChar();
 			if(c==','){
-				state = readDeclaration;
+				state = new ReadDeclaration();
 			}
 			else if(c=='}' || c==']'){
 				state = close;
@@ -143,7 +149,14 @@ public class Ws3dParser {
 		}
 	};
 
-	private State readObject = new State() {
+	private class ReadObject extends State {
+
+		private ObjectSetter setter;
+
+		public ReadObject(ObjectSetter setter) {
+			super();
+			this.setter = setter;
+		}
 
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
@@ -151,7 +164,7 @@ public class Ws3dParser {
 			// check type declaration start sequence
 			reader.readNext();
 			reader.check('(');
-			
+
 			reader.readNext();
 			String typeName = reader.until(new char[]{')'}, null, new char[]{'}', '{', '-', '[', ']'});
 
@@ -161,46 +174,60 @@ public class Ws3dParser {
 			}
 			ObjectParsingHandle handle = new ObjectParsingHandle(typeHandler);
 
-			((ObjectSetter) setter).set(handle.object);
+			setter.set(handle.object);
 			stack.push(handle);
 
 			// check type declaration start sequence
 			reader.readNext();
 			reader.check('{');
 
-			state = readDeclaration;
+			state = new ReadDeclaration();
 		}
 	};
 
-	private State readPrimitivesList = new State() {
+	private class ReadPrimitivesList extends State {
 
+		private PrimitivesListSetter setter;
+
+		public ReadPrimitivesList(PrimitivesListSetter setter) {
+			super();
+			this.setter = setter;
+		}
+		
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 
-			PrimitivesListParsingHandle handle = new PrimitivesListParsingHandle((PrimitivesListSetter) setter);
+			PrimitivesListParsingHandle handle = new PrimitivesListParsingHandle(setter);
 			stack.push(handle);
 
 			// check type declaration start sequence
 			reader.readNext();
 			reader.check('[');
 
-			state = readDeclaration;
+			state = new ReadDeclaration();
 		}
 	};
 
-	private State readObjectsList = new State() {
+	private class ReadObjectsList extends State {
+		
+		private ObjectsArraySetter setter;
+		
+		public ReadObjectsList(ObjectsArraySetter setter) {
+			super();
+			this.setter = setter;
+		}
 
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 
-			ObjectsListParsingHandle handle = new ObjectsListParsingHandle((ObjectsArraySetter) setter);
+			ObjectsListParsingHandle handle = new ObjectsListParsingHandle(setter);
 			stack.push(handle);
 
 			// check type declaration start sequence
 			reader.readNext();
 			reader.check('[');
 
-			state = readDeclaration;
+			state = new ReadDeclaration();
 		}
 	};
 
@@ -222,7 +249,7 @@ public class Ws3dParser {
 						state = close; // keep closing
 					}
 					else if(reader.isCurrent(',')){
-						state = readDeclaration;
+						state = new ReadDeclaration();
 					}
 					else{
 						throw new Ws3dParsingException("Illegal character");
