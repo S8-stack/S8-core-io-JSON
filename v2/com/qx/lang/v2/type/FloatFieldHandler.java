@@ -4,9 +4,9 @@ import java.lang.reflect.Field;
 
 import com.qx.lang.v2.ParsingException;
 
-public class DoubleFieldHandler extends PrimitiveFieldHandler {
+public class FloatFieldHandler extends PrimitiveFieldHandler {
 	
-	public DoubleFieldHandler(String name, Field field) {
+	public FloatFieldHandler(String name, Field field) {
 		super(name, field);
 	}
 
@@ -14,7 +14,7 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 	@Override
 	public void set(Object object, String value) throws ParsingException {
 		try {
-			field.setDouble(object, Double.valueOf(value));
+			field.setFloat(object, Float.valueOf(value));
 		} catch (IllegalAccessException | IllegalArgumentException e) {
 			throw new ParsingException("Cannot deserialize double due to: "+e.getMessage());
 		}
@@ -23,7 +23,7 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
-		return Double.toString(field.getDouble(object));
+		return Float.toString(field.getFloat(object));
 	}
 
 }

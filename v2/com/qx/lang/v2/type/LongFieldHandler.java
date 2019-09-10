@@ -4,10 +4,10 @@ import java.lang.reflect.Field;
 
 import com.qx.lang.v2.ParsingException;
 
-public class IntegerFieldHandler extends PrimitiveFieldHandler {
+public class LongFieldHandler extends PrimitiveFieldHandler {
 	
 	
-	public IntegerFieldHandler(String name, Field field) {
+	public LongFieldHandler(String name, Field field) {
 		super(name, field);
 	}
 
@@ -15,7 +15,7 @@ public class IntegerFieldHandler extends PrimitiveFieldHandler {
 	@Override
 	public void set(Object object, String value) throws ParsingException{
 		try {
-			field.setInt(object, Integer.valueOf(value));
+			field.setLong(object, Long.valueOf(value));
 		} catch (IllegalAccessException | IllegalArgumentException e) {
 			throw new ParsingException("Cannot set interger due to "+e.getMessage());
 		}
@@ -24,7 +24,7 @@ public class IntegerFieldHandler extends PrimitiveFieldHandler {
 
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
-		return Integer.toString(field.getInt(object));
+		return Long.toString(field.getLong(object));
 	}
 
 }

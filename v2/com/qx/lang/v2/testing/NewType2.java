@@ -12,4 +12,7 @@ public class NewType2 {
 	@WebScriptField(name="d")
 	public double d=12;
 	
+	@WebScriptField(name="aliases")
+	public String[] aliases;
+
 }

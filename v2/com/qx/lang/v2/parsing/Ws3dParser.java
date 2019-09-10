@@ -133,10 +133,23 @@ public class Ws3dParser {
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 			reader.readNext();
-			String value = reader.until(new char[]{',', '}'}, null, null);
+			
+			String value = null;
+			if(reader.is('(')) {
+				reader.readNext();
+				String declarator = reader.until(new char[]{')'}, null, new char[]{'}', '{', '-', '[', ']'});
+				int length = Integer.valueOf(declarator);
+				value = reader.readSection(length);
+				
+				reader.readNext();
+			}
+			else {
+				value = reader.until(new char[]{',', '}', ']'}, null, null);	
+			}
+			
 			try{
 				scope.define(value);
-			} 
+			}
 			catch (Exception e) {
 				throw new Ws3dParsingException(reader.line, reader.column, "Cannot set Object due to "+e.getMessage());
 			}
@@ -197,8 +210,6 @@ public class Ws3dParser {
 
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
-
-			scopes.push(scope);
 
 			// check type declaration start sequence
 			reader.readNext();
@@ -282,7 +293,7 @@ public class Ws3dParser {
 				}
 			}
 			else{
-				throw new Ws3dParsingException("Illegal termination");
+				throw new Ws3dParsingException("Illegal termination: "+c);
 			}
 		}
 	};

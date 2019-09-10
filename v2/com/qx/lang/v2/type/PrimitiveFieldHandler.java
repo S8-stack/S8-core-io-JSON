@@ -1,6 +1,9 @@
 package com.qx.lang.v2.type;
 
+import java.lang.reflect.Field;
+
 import com.qx.lang.v2.ParsingException;
+import com.qx.lang.v2.Ws3dContext;
 
 /**
  * 
@@ -10,6 +13,13 @@ import com.qx.lang.v2.ParsingException;
 public abstract class PrimitiveFieldHandler extends FieldHandler {
 
 	
+	
+	
+	public PrimitiveFieldHandler(String name, Field field) {
+		super(name, field);
+	}
+
+
 	/**
 	 * 
 	 * @param object
@@ -30,5 +40,10 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	@Override
 	public ScopeType getSort() {
 		return ScopeType.PRIMITIVE;
+	}
+	
+	@Override
+	public void subDiscover(Ws3dContext context) {
+		// nothing to sub-discover
 	}
 }

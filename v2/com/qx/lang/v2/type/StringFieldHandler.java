@@ -1,8 +1,15 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
 
-import com.qx.lang.v2.type.PrimitiveFieldHandler;
+import java.lang.reflect.Field;
 
-public class StringWs3dFieldHandler extends PrimitiveFieldHandler {
+import com.qx.lang.v2.ParsingException;
+
+public class StringFieldHandler extends PrimitiveFieldHandler {
+
+	public StringFieldHandler(String name, Field field) {
+		super(name, field);
+	}
+
 
 	@Override
 	public void set(Object object, String value) throws ParsingException {

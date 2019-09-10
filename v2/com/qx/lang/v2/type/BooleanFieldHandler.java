@@ -1,10 +1,17 @@
 package com.qx.lang.v2.type;
 
+import java.lang.reflect.Field;
+
 import com.qx.lang.v2.ParsingException;
 
 public class BooleanFieldHandler extends PrimitiveFieldHandler {
 	
 	
+	public BooleanFieldHandler(String name, Field field) {
+		super(name, field);
+	}
+
+
 	@Override
 	public void set(Object object, String value) throws ParsingException {
 		try {

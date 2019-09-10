@@ -7,7 +7,7 @@ import com.qx.lang.v2.type.FieldHandler.ScopeType;
 import com.qx.lang.v2.type.ObjectFieldHandler;
 import com.qx.lang.v2.type.ObjectsArrayFieldHandler;
 import com.qx.lang.v2.type.PrimitiveFieldHandler;
-import com.qx.lang.v2.type.PrimitivesListFieldHandler;
+import com.qx.lang.v2.type.PrimitivesArrayFieldHandler;
 import com.qx.lang.v2.type.TypeHandler;
 
 public class ObjectScope extends ParsingScope {
@@ -90,9 +90,9 @@ public class ObjectScope extends ParsingScope {
 
 			@Override
 			public void set(Object value) throws IllegalArgumentException, IllegalAccessException {
-				((PrimitivesListFieldHandler) fieldHandler).set(object, value);
+				((PrimitivesArrayFieldHandler) fieldHandler).set(object, value);
 			}
-		}, ((PrimitivesListFieldHandler) fieldHandler).getSubType());
+		}, ((PrimitivesArrayFieldHandler) fieldHandler).getSubType());
 
 
 		case OBJECTS_ARRAY: return new ObjectsArrayScope(new ObjectsArrayScope.Enclosing() {

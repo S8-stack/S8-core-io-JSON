@@ -104,8 +104,6 @@ public class TypeHandler {
 
 		/* <fields> */
 
-		Class<?> subType;
-
 		FieldHandler fieldHandler;
 		WebScriptField fieldAnnotation;
 
@@ -127,9 +125,7 @@ public class TypeHandler {
 				fieldHandlers.put(fieldAnnotation.name(), fieldHandler);
 
 				// explore recursively
-				if((subType=fieldHandler.getSubType())!=null){
-					context.discover(subType);
-				}
+				fieldHandler.subDiscover(context);
 			}
 		}
 	}

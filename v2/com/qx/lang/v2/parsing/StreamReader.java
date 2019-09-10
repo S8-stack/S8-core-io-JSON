@@ -201,7 +201,25 @@ public class StreamReader {
 	}
 
 
-
+	/**
+	 * read next char until reading end char
+	 * 
+	 * @param stoppingChars
+	 * @return
+	 * @throws IOException 
+	 * @throws Ws3dParsingException 
+	 * @throws Exception
+	 */
+	public String readSection(int length) throws Ws3dParsingException, IOException {
+		StringBuilder builder = new StringBuilder();
+		int i=0;
+		while(i<length){
+			readNext();
+			builder.append((char) c);
+			i++;
+		}
+		return builder.toString();
+	}
 
 
 	/**
@@ -226,7 +244,16 @@ public class StreamReader {
 			}
 		}
 	}
-
+	
+	
+	/**
+	 * 
+	 * @param values
+	 * @return
+	 */
+	public boolean is(char c){
+		return this.c==c;
+	}
 
 	/**
 	 * 

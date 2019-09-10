@@ -8,7 +8,11 @@ root:(NewType){
 	array:(12)[
 		0:(NewType2){
 			a:-98798776,
-			d:7688.87
+			d:7688.87,
+			aliases:(4)[
+				0:(12)abcdefghijkl,
+				2:(10)abcdefghij
+			]
 		},
 		1:(NewType2){
 			a:-98798776,

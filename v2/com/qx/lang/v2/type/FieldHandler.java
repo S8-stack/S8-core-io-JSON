@@ -2,7 +2,7 @@ package com.qx.lang.v2.type;
 
 import java.lang.reflect.Field;
 
-import com.qx.lang.v2.StringWs3dFieldHandler;
+import com.qx.lang.v2.Ws3dContext;
 import com.qx.lang.v2.annotation.WebScriptField;
 
 
@@ -24,6 +24,13 @@ public abstract class FieldHandler {
 	 */
 	public Field field;
 
+	
+	public FieldHandler(String name, Field field) {
+		super();
+		this.name = name;
+		this.field = field;
+	}
+	
 
 	/**
 	 * 
@@ -68,20 +75,29 @@ public abstract class FieldHandler {
 	public static FieldHandler create(Field field) {
 
 		WebScriptField annotation = field.getAnnotation(WebScriptField.class);
+		
+		String name = annotation.name();
 		Class<?> fieldType = field.getType();
-
-		FieldHandler setter;
 
 		// primitive
 		if(fieldType.isPrimitive()){
-			if(fieldType == double.class){
-				setter = new DoubleFieldHandler();
+			if(fieldType == boolean.class){
+				return new BooleanFieldHandler(name, field);
+			}
+			else if(fieldType == short.class){
+				return new ShortFieldHandler(name, field);
 			}
 			else if(fieldType == int.class){
-				setter = new IntegerFieldHandler();
+				return new IntegerFieldHandler(name, field);
 			}
-			else if(fieldType == boolean.class){
-				setter = new BooleanFieldHandler();
+			else if(fieldType == long.class){
+				return new LongFieldHandler(name, field);
+			}
+			else if(fieldType == float.class){
+				return new FloatFieldHandler(name, field);
+			}
+			else if(fieldType == double.class){
+				return new DoubleFieldHandler(name, field);
 			}
 			else{
 				throw new RuntimeException("Primitive type not supported "+fieldType.getName());
@@ -89,54 +105,34 @@ public abstract class FieldHandler {
 		}
 		// primitive
 		else if(fieldType == String.class){
-			setter = new StringWs3dFieldHandler();
+			return new StringFieldHandler(name, field);
 		}
 		// array
 		else if(fieldType.isArray()){
 			Class<?> componentType = fieldType.getComponentType();
 
-
 			// array of primitive
-			if(componentType.isPrimitive()){
-				/*
-				if(componentType == double.class){
-					setter = new Setter_DoubleArray();
-				}
-				else if(componentType == int.class){
-					setter = new Setter_IntegerArray();
-				}
-				else if(componentType == boolean.class){
-					setter = new Setter_BooleanArray();
-				}
-				else{
-					throw new RuntimeException("Primitive array type not supported "+fieldType.getName());
-				}
-				*/
-				throw new RuntimeException("Primitive array type not supported "+fieldType.getName());
-			}
-			// array of String
-			else if(componentType == String.class){
-				throw new RuntimeException("String array not supported "+fieldType.getName());
+			if(componentType.isPrimitive() || componentType == String.class){
+				return new PrimitivesArrayFieldHandler(name, field);
 			}
 			// array of object
 			else{
-				setter = new ObjectsArrayFieldHandler(componentType);
+				return new ObjectsArrayFieldHandler(name, field);
 			}
 		}
 		// default to object
 		else{
-			setter = new ObjectFieldHandler(fieldType);	
+			return new ObjectFieldHandler(name, field);	
 		}
-
-		setter.name = annotation.name();
-		setter.field = field;
-		return setter;
 	}
 
 
 	public String getName() {
 		return name;
 	}
+
+
+	public abstract void subDiscover(Ws3dContext context);
 
 
 }
