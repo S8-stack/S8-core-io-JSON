@@ -1,8 +1,10 @@
 package com.qx.lang.v2.type;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.qx.lang.v2.ParsingException;
+import com.qx.lang.v2.composing.ComposingScope;
 
 public class FloatFieldHandler extends PrimitiveFieldHandler {
 	
@@ -12,12 +14,25 @@ public class FloatFieldHandler extends PrimitiveFieldHandler {
 
 
 	@Override
-	public void set(Object object, String value) throws ParsingException {
+	public void parse(Object object, String value) throws ParsingException {
 		try {
 			field.setFloat(object, Float.valueOf(value));
 		} catch (IllegalAccessException | IllegalArgumentException e) {
 			throw new ParsingException("Cannot deserialize double due to: "+e.getMessage());
 		}
+	}
+	
+	@Override
+	public boolean compose(Object object, ComposingScope scope) 
+			throws IllegalArgumentException, IllegalAccessException, IOException  {
+		
+		scope.newLine();
+		scope.append(name);
+		scope.append(':');
+		
+		scope.append(Float.toString(field.getFloat(object)));
+		
+		return true;
 	}
 	
 

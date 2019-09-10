@@ -1,9 +1,11 @@
 package com.qx.lang.v2.type;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
-import com.qx.lang.v2.Ws3dContext;
-import com.qx.lang.v2.annotation.WebScriptField;
+import com.qx.lang.v2.JOOS_Context;
+import com.qx.lang.v2.JOOS_Field;
+import com.qx.lang.v2.composing.ComposingScope;
 
 
 
@@ -62,7 +64,7 @@ public abstract class FieldHandler {
 	public abstract Class<?> getSubType();
 
 
-	public abstract ScopeType getSort();
+	public abstract ScopeType getScopeType();
 
 	/**
 	 * 
@@ -74,7 +76,7 @@ public abstract class FieldHandler {
 	 */
 	public static FieldHandler create(Field field) {
 
-		WebScriptField annotation = field.getAnnotation(WebScriptField.class);
+		JOOS_Field annotation = field.getAnnotation(JOOS_Field.class);
 		
 		String name = annotation.name();
 		Class<?> fieldType = field.getType();
@@ -112,8 +114,31 @@ public abstract class FieldHandler {
 			Class<?> componentType = fieldType.getComponentType();
 
 			// array of primitive
-			if(componentType.isPrimitive() || componentType == String.class){
-				return new PrimitivesArrayFieldHandler(name, field);
+			if(componentType.isPrimitive()){
+				if(componentType==boolean.class) {
+					return new BooleanArrayFieldHandler(name, field);
+				}
+				else if(componentType==short.class) {
+					return new ShortArrayFieldHandler(name, field);
+				}
+				else if(componentType==int.class) {
+					return new IntegerArrayFieldHandler(name, field);
+				}
+				else if(componentType==long.class) {
+					return new LongArrayFieldHandler(name, field);
+				}
+				else if(componentType==float.class) {
+					return new FloatArrayFieldHandler(name, field);
+				}
+				else if(componentType==double.class) {
+					return new DoubleArrayFieldHandler(name, field);
+				}
+				else {
+					throw new RuntimeException("Primitives array type not supported "+componentType);
+				}
+			}
+			else if(componentType==String.class) {
+				return new StringArrayFieldHandler(name, field);
 			}
 			// array of object
 			else{
@@ -132,7 +157,9 @@ public abstract class FieldHandler {
 	}
 
 
-	public abstract void subDiscover(Ws3dContext context);
+	public abstract void subDiscover(JOOS_Context context);
 
+	public abstract boolean compose(Object object, ComposingScope scope) 
+			throws IOException, IllegalArgumentException, IllegalAccessException;
 
 }

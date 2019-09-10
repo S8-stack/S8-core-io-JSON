@@ -1,9 +1,11 @@
 package com.qx.lang.v2.type;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
+import com.qx.lang.v2.JOOS_Context;
 import com.qx.lang.v2.ParsingException;
-import com.qx.lang.v2.Ws3dContext;
+import com.qx.lang.v2.composing.ComposingScope;
 
 /**
  * 
@@ -27,8 +29,23 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	 * @throws ParsingException 
 	 * @throws Exception
 	 */
-	public abstract void set(Object object, String value) throws ParsingException;
+	public abstract void parse(Object object, String value) throws ParsingException;
 	
+	
+	
+	
+	
+	/**
+	 * 
+	 * @param object
+	 * @param writer
+	 * @return has actually ouput something
+	 * @throws IllegalArgumentException
+	 * @throws IllegalAccessException
+	 * @throws IOException
+	 */
+	public abstract boolean compose(Object object, ComposingScope scope) 
+			throws IllegalArgumentException, IllegalAccessException, IOException;
 
 	public abstract String get(Object object) throws IllegalArgumentException, IllegalAccessException;
 
@@ -38,12 +55,13 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	}
 	
 	@Override
-	public ScopeType getSort() {
+	public ScopeType getScopeType() {
 		return ScopeType.PRIMITIVE;
 	}
 	
+	
 	@Override
-	public void subDiscover(Ws3dContext context) {
+	public void subDiscover(JOOS_Context context) {
 		// nothing to sub-discover
 	}
 }

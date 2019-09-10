@@ -210,11 +210,17 @@ public class StreamReader {
 	 * @throws Ws3dParsingException 
 	 * @throws Exception
 	 */
-	public String readSection(int length) throws Ws3dParsingException, IOException {
+	public String readBlock(int length) throws Ws3dParsingException, IOException {
 		StringBuilder builder = new StringBuilder();
 		int i=0;
 		while(i<length){
-			readNext();
+			
+			c = reader.read();
+			
+			if(IS_DEBUG_ENABLED){
+				System.out.print((char) c);
+			}
+			
 			builder.append((char) c);
 			i++;
 		}

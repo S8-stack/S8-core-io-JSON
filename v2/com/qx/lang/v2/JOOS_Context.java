@@ -1,15 +1,20 @@
 package com.qx.lang.v2;
 
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.qx.lang.v2.annotation.WebScriptObject;
+import com.qx.lang.v2.composing.Composer;
+import com.qx.lang.v2.parsing.Parser;
+import com.qx.lang.v2.parsing.StreamReader;
 import com.qx.lang.v2.type.TypeHandler;
 
 
 
-public class Ws3dContext {
+public class JOOS_Context {
 
 	/**
 	 * root Types: the only allowed types to start a joos file in the context of this engine instance
@@ -20,7 +25,7 @@ public class Ws3dContext {
 
 
 
-	public Ws3dContext(){
+	public JOOS_Context(){
 		super();
 	}
 
@@ -46,7 +51,7 @@ public class Ws3dContext {
 			throw new RuntimeException("[Ws3dContext] Type is null");
 		}
 		
-		WebScriptObject annotation = type.getAnnotation(WebScriptObject.class);
+		JOOS_Type annotation = type.getAnnotation(JOOS_Type.class);
 		if(annotation==null){
 			throw new RuntimeException("[Ws3dContext] Type is not annotated: "+type);
 		}
@@ -75,4 +80,15 @@ public class Ws3dContext {
 		return typesByClassName.get(type.getName());
 	}
 
+	
+	public Object parse(Reader reader, boolean isVerbose) throws Ws3dParsingException, IOException {
+		Parser parser = new Parser(this, new StreamReader(reader), isVerbose);
+		return parser.parse();
+	}
+	
+	public void compose(Writer writer, Object object, String indentSequence,  boolean isVerbose) 
+			throws IllegalArgumentException, IllegalAccessException, IOException {
+		Composer composer = new Composer(this, writer, indentSequence, isVerbose);
+		composer.compose(object);
+	}
 }

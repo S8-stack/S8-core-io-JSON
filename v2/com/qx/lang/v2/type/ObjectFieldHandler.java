@@ -1,8 +1,10 @@
 package com.qx.lang.v2.type;
 
+import java.io.IOException;
 import java.lang.reflect.Field;
 
-import com.qx.lang.v2.Ws3dContext;
+import com.qx.lang.v2.JOOS_Context;
+import com.qx.lang.v2.composing.ComposingScope;
 
 public class ObjectFieldHandler extends FieldHandler {
 
@@ -26,16 +28,38 @@ public class ObjectFieldHandler extends FieldHandler {
 	}
 
 	@Override
-	public ScopeType getSort() {
+	public ScopeType getScopeType() {
 		return ScopeType.OBJECT;
 	}
 
 	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return field.get(object);
 	}
-	
+
 	@Override
-	public void subDiscover(Ws3dContext context) {
+	public void subDiscover(JOOS_Context context) {
 		context.discover(fieldType);
+	}
+
+	@Override
+	public boolean compose(Object object, ComposingScope scope) 
+			throws IOException, IllegalArgumentException, IllegalAccessException {
+
+		Object value = field.get(object);
+		if(value!=null) {
+			// declare type
+			scope.append(name);
+			scope.append(':');
+
+			// declare type
+			TypeHandler typeHandler = scope.getTypeHandler(value);
+			typeHandler.compose(value, scope);
+			return true;
+		}
+		else {
+			return false;
+		}
+
+
 	}
 }

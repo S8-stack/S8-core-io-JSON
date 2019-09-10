@@ -1,5 +1,6 @@
 package com.qx.lang.v2.type;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -8,9 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.qx.lang.v2.Ws3dContext;
-import com.qx.lang.v2.annotation.WebScriptField;
-import com.qx.lang.v2.annotation.WebScriptObject;
+import com.qx.lang.v2.JOOS_Context;
+import com.qx.lang.v2.JOOS_Field;
+import com.qx.lang.v2.JOOS_Type;
+import com.qx.lang.v2.composing.ComposingScope;
 
 /**
  * 
@@ -64,10 +66,10 @@ public class TypeHandler {
 	}
 
 
-	public void initialize(Ws3dContext context) {
+	public void initialize(JOOS_Context context) {
 
 		// get object annotation
-		WebScriptObject typeAnnotation = type.getAnnotation(WebScriptObject.class);
+		JOOS_Type typeAnnotation = type.getAnnotation(JOOS_Type.class);
 
 		if(typeAnnotation==null){
 			throw new RuntimeException("Missing annotation in type: "+type.getName());
@@ -105,13 +107,13 @@ public class TypeHandler {
 		/* <fields> */
 
 		FieldHandler fieldHandler;
-		WebScriptField fieldAnnotation;
+		JOOS_Field fieldAnnotation;
 
 		// for each method
 		for(Field field : type.getFields()){
 
 			// look for input (setter)
-			fieldAnnotation = field.getAnnotation(WebScriptField.class);
+			fieldAnnotation = field.getAnnotation(JOOS_Field.class);
 			if(fieldAnnotation!=null){
 
 				// check if already existing
@@ -131,11 +133,11 @@ public class TypeHandler {
 	}
 
 
-	public void getSubTypes(Ws3dContext context, List<TypeHandler> types){
+	public void getSubTypes(JOOS_Context context, List<TypeHandler> types){
 
 
 		TypeHandler subTypeHandler;
-		WebScriptObject typeAnnotation = type.getAnnotation(WebScriptObject.class);
+		JOOS_Type typeAnnotation = type.getAnnotation(JOOS_Type.class);
 
 		Class<?>[] subTypes = typeAnnotation.sub();
 		if(subTypes!=null){
@@ -169,5 +171,25 @@ public class TypeHandler {
 	public FieldHandler getFieldHandler(String name) {
 		return fieldHandlers.get(name);
 	}
+	
+	
+	public void compose(Object object, ComposingScope scope) 
+			throws IllegalArgumentException, IllegalAccessException, IOException {
+		
+		// declare type
+		scope.append('(');
+		scope.append(name);
+		scope.append(')');
 
+		// begin body
+		ComposingScope enclosedScope = scope.enterSubscope('{', '}');
+		
+		// write field
+		enclosedScope.open();
+		for(FieldHandler fieldHandler : fieldHandlers.values()) {
+			fieldHandler.compose(object, enclosedScope);
+		}
+		enclosedScope.close();
+	}
+	
 }

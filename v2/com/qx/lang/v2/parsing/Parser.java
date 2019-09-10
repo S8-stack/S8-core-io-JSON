@@ -3,7 +3,7 @@ package com.qx.lang.v2.parsing;
 import java.io.IOException;
 import java.util.Stack;
 
-import com.qx.lang.v2.Ws3dContext;
+import com.qx.lang.v2.JOOS_Context;
 import com.qx.lang.v2.Ws3dParsingException;
 import com.qx.lang.v2.type.TypeHandler;
 
@@ -15,9 +15,11 @@ import com.qx.lang.v2.type.TypeHandler;
  *	handler -> setter
  *
  */
-public class Ws3dParser {
+public class Parser {
 
-	private Ws3dContext context;
+	private boolean isVerbose;
+
+	private JOOS_Context context;
 
 	private StreamReader reader;
 
@@ -26,12 +28,13 @@ public class Ws3dParser {
 	private Stack<ParsingScope> scopes;
 
 
-	public Ws3dParser(Ws3dContext context, StreamReader reader) {
+	public Parser(JOOS_Context context, StreamReader reader, boolean isVerbose) {
 		super();
 		this.reader = reader;
 		//rootBuilder = new RootParsedElement(context);
 
 		state = new ReadDeclaration();
+		this.isVerbose = isVerbose;
 		this.context = context;
 	}
 
@@ -88,8 +91,10 @@ public class Ws3dParser {
 			reader.readNext();
 
 			String declarator = reader.until(new char[]{':', '}', ']'}, null, null);
-			System.out.println("[XML_Parser] read header: "+declarator);
-
+			if(isVerbose) {
+				System.out.println("[JOOS_Parser] read header: "+declarator);
+			}
+			
 			char current = reader.getCurrentChar();
 			if(current==':'){
 				// acquire selected fieldHandler as new setter
@@ -133,20 +138,20 @@ public class Ws3dParser {
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 			reader.readNext();
-			
+
 			String value = null;
 			if(reader.is('(')) {
 				reader.readNext();
 				String declarator = reader.until(new char[]{')'}, null, new char[]{'}', '{', '-', '[', ']'});
 				int length = Integer.valueOf(declarator);
-				value = reader.readSection(length);
-				
+				value = reader.readBlock(length);
+
 				reader.readNext();
 			}
 			else {
 				value = reader.until(new char[]{',', '}', ']'}, null, null);	
 			}
-			
+
 			try{
 				scope.define(value);
 			}

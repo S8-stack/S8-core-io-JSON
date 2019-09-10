@@ -10,7 +10,8 @@ root:(NewType){
 			a:-98798776,
 			d:7688.87,
 			aliases:(4)[
-				0:(12)abcdefghijkl,
+				0:(20)abcdefghijk{}
+				(),
 				2:(10)abcdefghij
 			]
 		},

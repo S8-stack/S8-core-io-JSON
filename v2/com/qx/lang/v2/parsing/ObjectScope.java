@@ -64,13 +64,13 @@ public class ObjectScope extends ParsingScope {
 			throw new Ws3dParsingException("Unknown field: "+name);
 		}
 
-		switch(fieldHandler.getSort()){
+		switch(fieldHandler.getScopeType()){
 
 		case PRIMITIVE: return new PrimitiveScope(new PrimitiveScope.Enclosing() {
 
 			@Override
 			public void set(String value) throws Ws3dParsingException, ParsingException {
-				((PrimitiveFieldHandler) fieldHandler).set(object, value);
+				((PrimitiveFieldHandler) fieldHandler).parse(object, value);
 			}
 		});
 
