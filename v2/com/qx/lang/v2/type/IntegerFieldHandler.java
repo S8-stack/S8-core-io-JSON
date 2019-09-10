@@ -1,17 +1,18 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
 
-public class IntegerWs3dFieldHandler extends PrimitiveWs3dFieldHandler {
+import com.qx.lang.v2.ParsingException;
+
+public class IntegerFieldHandler extends PrimitiveFieldHandler {
 	
 	
 	@Override
-	public void set(Object object, String value) throws DeserializationException{
+	public void set(Object object, String value) throws ParsingException{
 		try {
 			field.setInt(object, Integer.valueOf(value));
 		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new DeserializationException("Cannot set interger due to "+e.getMessage());
+			throw new ParsingException("Cannot set interger due to "+e.getMessage());
 		}
 	}
-	
 	
 
 	@Override

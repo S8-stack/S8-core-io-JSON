@@ -1,7 +1,7 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
 
 
-import java.util.List;
+import com.qx.lang.v2.Ws3dParsingException;
 
 
 /**
@@ -9,20 +9,20 @@ import java.util.List;
  * @author pc
  *
  */
-public class ObjectsListWs3dFieldHandler extends Ws3dFieldHandler {
+public class ObjectsArrayFieldHandler extends FieldHandler {
 
 
 	private Class<?> componentType;
 
 
-	public ObjectsListWs3dFieldHandler(Class<?> componentType) {
+	public ObjectsArrayFieldHandler(Class<?> componentType) {
 		super();
 		this.componentType = componentType;
 	}
 
-	public void set(Object object, List<Object> values) throws Ws3dParsingException {
+	public void set(Object object, Object valuesArray) throws Ws3dParsingException {
 		try {
-			field.set(object, values);
+			field.set(object, valuesArray);
 		} catch (IllegalAccessException | IllegalArgumentException e) {
 			throw new Ws3dParsingException("Cannot set Object array due to "+e.getMessage());
 		}
@@ -33,11 +33,8 @@ public class ObjectsListWs3dFieldHandler extends Ws3dFieldHandler {
 		return componentType;
 	}
 
-
-
 	@Override
 	public Sort getSort() {
-		return Sort.OBJECTS_LIST;
+		return Sort.OBJECTS_ARRAY;
 	}
-
 }

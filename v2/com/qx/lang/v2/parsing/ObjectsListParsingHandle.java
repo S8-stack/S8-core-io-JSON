@@ -1,23 +1,26 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.parsing;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PrimitivesListParsingHandle extends ParsingHandle {
-	
-	
-	private PrimitivesListSetter setter;
-	
-	private List<String> buffer;
-	
-	
-	public PrimitivesListParsingHandle(PrimitivesListSetter setter) {
+import com.qx.lang.v2.Ws3dParsingException;
+
+public class ObjectsListParsingHandle extends ParsingHandle {
+
+
+
+	private ObjectsArraySetter setter;
+
+	private List<Object> buffer;
+
+
+	public ObjectsListParsingHandle(ObjectsArraySetter setter) {
 		super();
 		this.setter = setter;
 		this.buffer = new ArrayList<>();
 	}
-	
-	
+
+
 	public void add(String value){
 		buffer.add(value);
 	}
@@ -36,7 +39,7 @@ public class PrimitivesListParsingHandle extends ParsingHandle {
 			}
 		};
 	}
-	
+
 	@Override
 	public void close() throws Ws3dParsingException{
 		setter.set(buffer);
@@ -47,5 +50,5 @@ public class PrimitivesListParsingHandle extends ParsingHandle {
 	public boolean isList() {
 		return true;
 	}
-	
+
 }

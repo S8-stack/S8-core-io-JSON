@@ -1,13 +1,13 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
 
-public class ObjectWs3dFieldHandler extends Ws3dFieldHandler {
+public class ObjectFieldHandler extends FieldHandler {
 
 	/**
 	 * 
 	 */
 	public Class<?> fieldType;
 
-	public ObjectWs3dFieldHandler(Class<?> fieldType) {
+	public ObjectFieldHandler(Class<?> fieldType) {
 		super();
 		this.fieldType = fieldType;
 	}

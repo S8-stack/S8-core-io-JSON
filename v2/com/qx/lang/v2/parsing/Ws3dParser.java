@@ -1,7 +1,11 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.parsing;
 
 import java.io.IOException;
 import java.util.Stack;
+
+import com.qx.lang.v2.Ws3dContext;
+import com.qx.lang.v2.Ws3dParsingException;
+import com.qx.lang.v2.type.TypeHandler;
 
 
 /**
@@ -15,7 +19,7 @@ public class Ws3dParser {
 
 	private Ws3dContext context;
 
-	private Ws3dStreamReader reader;
+	private StreamReader reader;
 
 	protected State state;
 
@@ -23,7 +27,7 @@ public class Ws3dParser {
 
 	private Setter setter;
 
-	public Ws3dParser(Ws3dContext context, Ws3dStreamReader reader) {
+	public Ws3dParser(Ws3dContext context, StreamReader reader) {
 		super();
 		this.reader = reader;
 		//rootBuilder = new RootParsedElement(context);
@@ -98,7 +102,7 @@ public class Ws3dParser {
 					state = readPrimitive;	
 					break;
 
-				case PRIMITIVES_LIST:
+				case PRIMITIVES_ARRAY:
 					state = readPrimitivesList;
 					break;
 
@@ -106,7 +110,7 @@ public class Ws3dParser {
 					state = readObject;
 					break;
 
-				case OBJECTS_LIST:
+				case OBJECTS_ARRAY:
 					state = readObjectsList;
 					break;
 				}		
@@ -151,7 +155,7 @@ public class Ws3dParser {
 			reader.readNext();
 			String typeName = reader.until(new char[]{')'}, null, new char[]{'}', '{', '-', '[', ']'});
 
-			Ws3dTypeHandler typeHandler = context.get(typeName);
+			TypeHandler typeHandler = context.get(typeName);
 			if(typeHandler==null){
 				throw new Ws3dParsingException("Unknow type: "+typeName);
 			}
@@ -189,7 +193,7 @@ public class Ws3dParser {
 		@Override
 		public void parse() throws Ws3dParsingException, IOException {
 
-			ObjectsListParsingHandle handle = new ObjectsListParsingHandle((ObjectsListSetter) setter);
+			ObjectsListParsingHandle handle = new ObjectsListParsingHandle((ObjectsArraySetter) setter);
 			stack.push(handle);
 
 			// check type declaration start sequence

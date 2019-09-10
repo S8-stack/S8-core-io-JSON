@@ -1,13 +1,15 @@
 package com.qx.lang.v2;
 
-public class StringWs3dFieldHandler extends PrimitiveWs3dFieldHandler {
+import com.qx.lang.v2.type.PrimitiveFieldHandler;
+
+public class StringWs3dFieldHandler extends PrimitiveFieldHandler {
 
 	@Override
-	public void set(Object object, String value) throws DeserializationException {
+	public void set(Object object, String value) throws ParsingException {
 		try {
 			field.set(object, value);
 		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new DeserializationException("Cannot deserialize String due to: "+e.getMessage());
+			throw new ParsingException("Cannot deserialize String due to: "+e.getMessage());
 		}
 	}
 	

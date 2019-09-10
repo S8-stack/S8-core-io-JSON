@@ -1,17 +1,26 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.parsing;
 
 import java.util.List;
+
+import com.qx.lang.v2.ParsingException;
+import com.qx.lang.v2.Ws3dParsingException;
+import com.qx.lang.v2.type.ObjectFieldHandler;
+import com.qx.lang.v2.type.ObjectsArrayFieldHandler;
+import com.qx.lang.v2.type.PrimitiveFieldHandler;
+import com.qx.lang.v2.type.PrimitivesListFieldHandler;
+import com.qx.lang.v2.type.TypeHandler;
+import com.qx.lang.v2.type.FieldHandler;
 
 public class ObjectParsingHandle extends ParsingHandle {
 
 
-	public Ws3dTypeHandler handler;
+	public TypeHandler handler;
 
 	public Object object;
 
 
 
-	public ObjectParsingHandle(Ws3dTypeHandler handler) {
+	public ObjectParsingHandle(TypeHandler handler) {
 		super();
 		this.handler = handler;
 		try {
@@ -28,7 +37,7 @@ public class ObjectParsingHandle extends ParsingHandle {
 	public Setter getSetter(String name) throws Ws3dParsingException {
 		
 		
-		Ws3dFieldHandler fieldHandler = handler.getFieldHandler(name);
+		FieldHandler fieldHandler = handler.getFieldHandler(name);
 		if(fieldHandler==null){
 			throw new Ws3dParsingException("Unknown field: "+name);
 		}
@@ -39,9 +48,9 @@ public class ObjectParsingHandle extends ParsingHandle {
 			@Override
 			public void set(String value) throws Ws3dParsingException {
 				try {
-					((PrimitiveWs3dFieldHandler) fieldHandler).set(object, value);
+					((PrimitiveFieldHandler) fieldHandler).set(object, value);
 				}
-				catch (IllegalArgumentException | DeserializationException e) {
+				catch (IllegalArgumentException | ParsingException e) {
 					throw new Ws3dParsingException("Failed to set object due to "+e.getMessage());
 				}
 			}
@@ -51,7 +60,7 @@ public class ObjectParsingHandle extends ParsingHandle {
 			@Override
 			public void set(Object value) throws Ws3dParsingException {
 				try {
-					((ObjectWs3dFieldHandler) fieldHandler).set(object, value);
+					((ObjectFieldHandler) fieldHandler).set(object, value);
 				}
 				catch (IllegalArgumentException | IllegalAccessException e) {
 					throw new Ws3dParsingException("Failed to set object due to "+e.getMessage());
@@ -59,21 +68,21 @@ public class ObjectParsingHandle extends ParsingHandle {
 			}
 		};
 
-		case PRIMITIVES_LIST: return new PrimitivesListSetter() {
+		case PRIMITIVES_ARRAY: return new PrimitivesListSetter() {
 			@Override
 			public void set(List<String> values) throws Ws3dParsingException {
 				try {
-					((PrimitivesListWs3dFieldHandler) fieldHandler).set(object, values);
+					((PrimitivesListFieldHandler) fieldHandler).set(object, values);
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					throw new Ws3dParsingException(e.getMessage());
 				}
 			}
 		};
 
-		case OBJECTS_LIST: return new ObjectsListSetter() {
+		case OBJECTS_ARRAY: return new ObjectsArraySetter() {
 			@Override
-			public void set(List<Object> values) throws Ws3dParsingException {
-				((ObjectsListWs3dFieldHandler) fieldHandler).set(object, values);
+			public void set(Object array) throws Ws3dParsingException {
+				((ObjectsArrayFieldHandler) fieldHandler).set(object, array);
 			}
 		};
 

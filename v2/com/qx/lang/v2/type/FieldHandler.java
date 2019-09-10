@@ -1,16 +1,16 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
 
 import java.lang.reflect.Field;
-import java.util.List;
 
+import com.qx.lang.v2.StringWs3dFieldHandler;
 import com.qx.lang.v2.annotation.WebScriptField;
 
 
 
-public abstract class Ws3dFieldHandler {
+public abstract class FieldHandler {
 	
 	public enum Sort {
-		PRIMITIVE, OBJECT, PRIMITIVES_LIST, OBJECTS_LIST;
+		PRIMITIVE, OBJECT, PRIMITIVES_ARRAY, OBJECTS_ARRAY;
 	}
 	
 
@@ -65,23 +65,23 @@ public abstract class Ws3dFieldHandler {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Ws3dFieldHandler create(Field field) {
+	public static FieldHandler create(Field field) {
 
 		WebScriptField annotation = field.getAnnotation(WebScriptField.class);
 		Class<?> fieldType = field.getType();
 
-		Ws3dFieldHandler setter;
+		FieldHandler setter;
 
 		// primitive
 		if(fieldType.isPrimitive()){
 			if(fieldType == double.class){
-				setter = new DoubleWs3dFieldHandler();
+				setter = new DoubleFieldHandler();
 			}
 			else if(fieldType == int.class){
-				setter = new IntegerWs3dFieldHandler();
+				setter = new IntegerFieldHandler();
 			}
 			else if(fieldType == boolean.class){
-				setter = new BooleanWs3dFieldHandler();
+				setter = new BooleanFieldHandler();
 			}
 			else{
 				throw new RuntimeException("Primitive type not supported "+fieldType.getName());
@@ -92,8 +92,9 @@ public abstract class Ws3dFieldHandler {
 			setter = new StringWs3dFieldHandler();
 		}
 		// array
-		else if(List.class.isAssignableFrom(fieldType)){
-			Class<?> componentType = (Class<?>) fieldType.getGenericInterfaces()[0];
+		else if(fieldType.isArray()){
+			Class<?> componentType = fieldType.getComponentType();
+
 
 			// array of primitive
 			if(componentType.isPrimitive()){
@@ -119,12 +120,12 @@ public abstract class Ws3dFieldHandler {
 			}
 			// array of object
 			else{
-				setter = new ObjectsListWs3dFieldHandler(componentType);
+				setter = new ObjectsArrayFieldHandler(componentType);
 			}
 		}
 		// default to object
 		else{
-			setter = new ObjectWs3dFieldHandler(fieldType);	
+			setter = new ObjectFieldHandler(fieldType);	
 		}
 
 		setter.name = annotation.name();

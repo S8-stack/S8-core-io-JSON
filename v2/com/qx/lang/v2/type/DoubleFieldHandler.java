@@ -1,14 +1,15 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
 
+import com.qx.lang.v2.ParsingException;
 
-public class DoubleWs3dFieldHandler extends PrimitiveWs3dFieldHandler {
+public class DoubleFieldHandler extends PrimitiveFieldHandler {
 	
 	@Override
-	public void set(Object object, String value) throws DeserializationException {
+	public void set(Object object, String value) throws ParsingException {
 		try {
 			field.setDouble(object, Double.valueOf(value));
 		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new DeserializationException("Cannot deserialize double due to: "+e.getMessage());
+			throw new ParsingException("Cannot deserialize double due to: "+e.getMessage());
 		}
 	}
 	

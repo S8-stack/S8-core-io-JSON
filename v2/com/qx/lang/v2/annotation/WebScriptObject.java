@@ -12,6 +12,6 @@ public @interface WebScriptObject {
 	public String name();
 	
 	
-	public Class<?>[] sub();
+	public Class<?>[] sub() default {};
 	
 }

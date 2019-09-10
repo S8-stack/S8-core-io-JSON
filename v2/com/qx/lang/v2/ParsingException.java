@@ -1,6 +1,6 @@
 package com.qx.lang.v2;
 
-public class DeserializationException extends Exception {
+public class ParsingException extends Exception {
 
 	/**
 	 * 
@@ -11,11 +11,11 @@ public class DeserializationException extends Exception {
 	
 	public int column;
 	
-	public DeserializationException(String message){
+	public ParsingException(String message){
 		super(message);
 	}
 	
-	public DeserializationException(int line, int column, String message){
+	public ParsingException(int line, int column, String message){
 		super(message);
 		this.line = line;
 		this.column = column;

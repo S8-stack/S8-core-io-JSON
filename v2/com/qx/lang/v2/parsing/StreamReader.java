@@ -1,10 +1,13 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.parsing;
 
 import java.io.IOException;
 import java.io.Reader;
 
+import com.qx.lang.v2.Ws3dParsingException;
+import com.qx.lang.v2.Ws3dSyntax;
 
-public class Ws3dStreamReader {
+
+public class StreamReader {
 	
 	public static final boolean IS_DEBUG_ENABLED = true;
 
@@ -26,7 +29,7 @@ public class Ws3dStreamReader {
 	 * @param reader
 	 * @param filename: for debugging purposes
 	 */
-	public Ws3dStreamReader(Reader reader) {
+	public StreamReader(Reader reader) {
 		super();
 		this.reader = reader;
 		
@@ -64,7 +67,7 @@ public class Ws3dStreamReader {
 	 */
 	public void check(char c) throws Ws3dParsingException {
 		if(this.c!=c){
-			throw new Ws3dParsingException(line, column, "Unexpected sequence encountered while deserializing");
+			throw new Ws3dParsingException(c, line, column, "Unexpected sequence encountered while deserializing");
 		}
 	}
 

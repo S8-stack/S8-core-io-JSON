@@ -1,4 +1,4 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.qx.lang.v2.Ws3dContext;
 import com.qx.lang.v2.annotation.WebScriptField;
 import com.qx.lang.v2.annotation.WebScriptObject;
 
@@ -16,7 +17,7 @@ import com.qx.lang.v2.annotation.WebScriptObject;
  * @author pc
  *
  */
-public class Ws3dTypeHandler {
+public class TypeHandler {
 
 	/**
 	 * name of the type
@@ -31,12 +32,12 @@ public class Ws3dTypeHandler {
 	/**
 	 * child types
 	 */
-	public List<Ws3dTypeHandler> subTypes = new ArrayList<>();
+	public List<TypeHandler> subTypes = new ArrayList<>();
 
 	/**
 	 * field handlers
 	 */
-	public Map<String, Ws3dFieldHandler> fieldHandlers = new HashMap<String, Ws3dFieldHandler>();
+	public Map<String, FieldHandler> fieldHandlers = new HashMap<String, FieldHandler>();
 
 
 
@@ -57,7 +58,7 @@ public class Ws3dTypeHandler {
 	 * @param types
 	 * @throws Exception
 	 */
-	public Ws3dTypeHandler(Class<?> type){
+	public TypeHandler(Class<?> type){
 		super();
 		this.type = type;
 	}
@@ -105,7 +106,7 @@ public class Ws3dTypeHandler {
 
 		Class<?> subType;
 
-		Ws3dFieldHandler fieldHandler;
+		FieldHandler fieldHandler;
 		WebScriptField fieldAnnotation;
 
 		// for each method
@@ -121,7 +122,7 @@ public class Ws3dTypeHandler {
 				}
 
 				// create field handler
-				fieldHandler = Ws3dFieldHandler.create(field);
+				fieldHandler = FieldHandler.create(field);
 
 				fieldHandlers.put(fieldAnnotation.name(), fieldHandler);
 
@@ -134,10 +135,10 @@ public class Ws3dTypeHandler {
 	}
 
 
-	public void getSubTypes(Ws3dContext context, List<Ws3dTypeHandler> types){
+	public void getSubTypes(Ws3dContext context, List<TypeHandler> types){
 
 
-		Ws3dTypeHandler subTypeHandler;
+		TypeHandler subTypeHandler;
 		WebScriptObject typeAnnotation = type.getAnnotation(WebScriptObject.class);
 
 		Class<?>[] subTypes = typeAnnotation.sub();
@@ -169,7 +170,7 @@ public class Ws3dTypeHandler {
 	}
 
 
-	public Ws3dFieldHandler getFieldHandler(String name) {
+	public FieldHandler getFieldHandler(String name) {
 		return fieldHandlers.get(name);
 	}
 

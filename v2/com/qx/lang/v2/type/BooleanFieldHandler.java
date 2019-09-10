@@ -1,14 +1,16 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
 
-public class BooleanWs3dFieldHandler extends PrimitiveWs3dFieldHandler {
+import com.qx.lang.v2.ParsingException;
+
+public class BooleanFieldHandler extends PrimitiveFieldHandler {
 	
 	
 	@Override
-	public void set(Object object, String value) throws DeserializationException {
+	public void set(Object object, String value) throws ParsingException {
 		try {
 			field.setBoolean(object, Boolean.valueOf(value));
 		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new DeserializationException("Cannot deserialize boolean due to: "+e.getMessage());
+			throw new ParsingException("Cannot deserialize boolean due to: "+e.getMessage());
 		}
 	}
 	

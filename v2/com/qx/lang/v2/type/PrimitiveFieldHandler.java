@@ -1,21 +1,23 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.type;
+
+import com.qx.lang.v2.ParsingException;
 
 /**
  * 
  * @author pc
  *
  */
-public abstract class PrimitiveWs3dFieldHandler extends Ws3dFieldHandler {
+public abstract class PrimitiveFieldHandler extends FieldHandler {
 
 	
 	/**
 	 * 
 	 * @param object
 	 * @param value
-	 * @throws DeserializationException 
+	 * @throws ParsingException 
 	 * @throws Exception
 	 */
-	public abstract void set(Object object, String value) throws DeserializationException;
+	public abstract void set(Object object, String value) throws ParsingException;
 	
 
 	public abstract String get(Object object) throws IllegalArgumentException, IllegalAccessException;

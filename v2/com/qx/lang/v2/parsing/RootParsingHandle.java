@@ -1,4 +1,6 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.parsing;
+
+import com.qx.lang.v2.Ws3dParsingException;
 
 public class RootParsingHandle extends ParsingHandle {
 

@@ -1,8 +1,10 @@
-package com.qx.lang.v2;
+package com.qx.lang.v2.parsing;
 
 import java.util.List;
 
-import com.qx.lang.v2.Ws3dFieldHandler.Sort;
+import com.qx.lang.v2.Ws3dParsingException;
+import com.qx.lang.v2.type.FieldHandler;
+import com.qx.lang.v2.type.FieldHandler.Sort;
 
 public abstract class PrimitivesListSetter extends Setter {
 
@@ -10,6 +12,6 @@ public abstract class PrimitivesListSetter extends Setter {
 	
 	@Override
 	public Sort getSort(){
-		return Sort.PRIMITIVES_LIST;
+		return Sort.PRIMITIVES_ARRAY;
 	}
 }
