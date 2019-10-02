@@ -80,6 +80,10 @@ public class FieldHandlerFactory {
 		else if(fieldType == String.class){
 			return new StringFieldHandler(name, field);
 		}
+		// enum
+		else if(fieldType.isEnum()){
+			return new EnumFieldHandler(name, field);
+		}
 		// array
 		else if(fieldType.isArray()){
 			Class<?> componentType = fieldType.getComponentType();
