@@ -36,9 +36,10 @@ public class ShortFieldHandler extends PrimitiveFieldHandler {
 		return true;
 	}
 
+	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return Short.toString(field.getShort(object));
 	}
-	
+	*/
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import com.qx.lang.joos.composing.Composer;
 import com.qx.lang.joos.parsing.Parser;
 import com.qx.lang.joos.parsing.StreamReader;
+import com.qx.lang.joos.type.FieldHandlerFactory;
 import com.qx.lang.joos.type.TypeHandler;
 
 
@@ -23,7 +24,7 @@ public class JOOS_Context {
 
 	private Map<String, TypeHandler> typesByClassName = new HashMap<String, TypeHandler>();
 
-
+	private FieldHandlerFactory fieldHandlerFactory = new FieldHandlerFactory();
 
 	public JOOS_Context(){
 		super();
@@ -33,8 +34,15 @@ public class JOOS_Context {
 	public void discover(Class<?> type){
 		get(type);
 	}
+	
+	public void addFieldExtension(FieldHandlerFactory.Extension extension) {
+		fieldHandlerFactory.add(extension);
+	}
 
 
+	public FieldHandlerFactory getFieldFactory() {
+		return fieldHandlerFactory;
+	}
 
 	/**
 	 * 

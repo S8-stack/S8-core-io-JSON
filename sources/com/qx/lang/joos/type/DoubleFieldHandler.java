@@ -36,9 +36,11 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 	}
 	
 
+	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return Double.toString(field.getDouble(object));
 	}
+	*/
 
 }

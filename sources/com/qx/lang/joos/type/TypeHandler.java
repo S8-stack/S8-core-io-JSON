@@ -122,7 +122,7 @@ public class TypeHandler {
 				}
 
 				// create field handler
-				fieldHandler = FieldHandler.create(field);
+				fieldHandler = context.getFieldFactory().create(field);
 
 				fieldHandlers.put(fieldAnnotation.name(), fieldHandler);
 

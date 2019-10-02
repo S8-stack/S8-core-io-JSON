@@ -30,17 +30,17 @@ public class IntegerFieldHandler extends PrimitiveFieldHandler {
 		scope.newLine();
 		scope.append(name);
 		scope.append(':');
-		
 		scope.append(Integer.toString(field.getInt(object)));
-
 		return true;
 	}
 
 
+	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return Integer.toString(field.getInt(object));
 	}
+	*/
 
 
 }

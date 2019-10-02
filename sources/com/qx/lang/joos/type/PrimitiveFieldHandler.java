@@ -47,7 +47,7 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	public abstract boolean compose(Object object, ComposingScope scope) 
 			throws IllegalArgumentException, IllegalAccessException, IOException;
 
-	public abstract String get(Object object) throws IllegalArgumentException, IllegalAccessException;
+	//public abstract String get(Object object) throws IllegalArgumentException, IllegalAccessException;
 
 	@Override
 	public Class<?> getSubType() {

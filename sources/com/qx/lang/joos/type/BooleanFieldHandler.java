@@ -7,8 +7,8 @@ import com.qx.lang.joos.ParsingException;
 import com.qx.lang.joos.composing.ComposingScope;
 
 public class BooleanFieldHandler extends PrimitiveFieldHandler {
-	
-	
+
+
 	public BooleanFieldHandler(String name, Field field) {
 		super(name, field);
 	}
@@ -22,23 +22,24 @@ public class BooleanFieldHandler extends PrimitiveFieldHandler {
 			throw new ParsingException("Cannot deserialize boolean due to: "+e.getMessage());
 		}
 	}
-	
 
+	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return Boolean.toString(field.getBoolean(object));
 	}
-	
+	 */
+
 	@Override
 	public boolean compose(Object object, ComposingScope scope) 
 			throws IllegalArgumentException, IllegalAccessException, IOException  {
-		
+
 		scope.newLine();
 		scope.append(name);
 		scope.append(':');
-		
+
 		scope.append(Boolean.toString(field.getBoolean(object)));
-		
+
 		return true;
 	}
 

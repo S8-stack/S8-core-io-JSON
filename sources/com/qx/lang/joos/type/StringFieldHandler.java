@@ -45,10 +45,11 @@ public class StringFieldHandler extends PrimitiveFieldHandler {
 		
 	}
 	
-
+	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return (String) field.get(object);
 	}
+	*/
 }
 

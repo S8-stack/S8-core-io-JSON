@@ -35,10 +35,11 @@ public class FloatFieldHandler extends PrimitiveFieldHandler {
 		return true;
 	}
 	
-
+	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return Float.toString(field.getFloat(object));
 	}
+	*/
 
 }

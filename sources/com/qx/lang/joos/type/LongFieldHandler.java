@@ -37,10 +37,11 @@ public class LongFieldHandler extends PrimitiveFieldHandler {
 	}
 	
 
+	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return Long.toString(field.getLong(object));
 	}
-	
+	*/
 
 }
