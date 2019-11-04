@@ -7,8 +7,8 @@
  */
 module com.qx.lang.joos {
 	
-	exports com.qx.lang.joos.parsing;
-	exports com.qx.lang.joos.composing;
-	exports com.qx.lang.joos;
-	exports com.qx.lang.joos.type;
+	exports com.qx.level0.lang.joos.parsing;
+	exports com.qx.level0.lang.joos.composing;
+	exports com.qx.level0.lang.joos;
+	exports com.qx.level0.lang.joos.type;
 }

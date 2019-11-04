@@ -1,7 +1,7 @@
 package com.qx.lang.v2.testing;
 
-import com.qx.lang.joos.JOOS_Field;
-import com.qx.lang.joos.JOOS_Type;
+import com.qx.level0.lang.joos.JOOS_Field;
+import com.qx.level0.lang.joos.JOOS_Type;
 
 @JOOS_Type(name="NewType2", sub= {NewType3.class})
 public class NewType2 {

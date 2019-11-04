@@ -6,8 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import com.qx.lang.joos.JOOS_Context;
-import com.qx.lang.joos.JOOS_ParsingException;
+import com.qx.level0.lang.joos.JOOS_Context;
+import com.qx.level0.lang.joos.JOOS_ParsingException;
 
 public class LaunchParsingTest {
 
