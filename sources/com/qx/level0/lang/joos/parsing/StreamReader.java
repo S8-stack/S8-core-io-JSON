@@ -1,7 +1,6 @@
 package com.qx.level0.lang.joos.parsing;
 
 import java.io.IOException;
-import java.io.Reader;
 
 import com.qx.level0.lang.joos.JOOS_ParsingException;
 import com.qx.level0.lang.joos.Ws3dSyntax;
@@ -11,7 +10,7 @@ public class StreamReader {
 	
 	public static final boolean IS_DEBUG_ENABLED = true;
 
-	private Reader reader;
+	private JOOS_Reader reader;
 
 	public int line;
 
@@ -29,7 +28,7 @@ public class StreamReader {
 	 * @param reader
 	 * @param filename: for debugging purposes
 	 */
-	public StreamReader(Reader reader) {
+	public StreamReader(JOOS_Reader reader) {
 		super();
 		this.reader = reader;
 		
@@ -329,9 +328,11 @@ public class StreamReader {
 	 * Closing a previously closed stream has no effect.
 	 * @throws IOException
 	 */
+	/*
 	public void close() throws IOException {
 		reader.close();
 	}
+	*/
 
 
 	public boolean isFinished(){

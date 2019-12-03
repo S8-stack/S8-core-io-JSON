@@ -16,7 +16,11 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 
 	
 	
-	
+	/**
+	 * 
+	 * @param name
+	 * @param field
+	 */
 	public PrimitiveFieldHandler(String name, Field field) {
 		super(name, field);
 	}
@@ -44,6 +48,7 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	 * @throws IllegalAccessException
 	 * @throws IOException
 	 */
+	@Override
 	public abstract boolean compose(Object object, ComposingScope scope) 
 			throws IllegalArgumentException, IllegalAccessException, IOException;
 

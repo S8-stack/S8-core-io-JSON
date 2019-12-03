@@ -2,12 +2,12 @@ package com.qx.level0.lang.joos;
 
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.qx.level0.lang.joos.composing.Composer;
+import com.qx.level0.lang.joos.composing.JOOS_Writer;
+import com.qx.level0.lang.joos.parsing.JOOS_Reader;
 import com.qx.level0.lang.joos.parsing.Parser;
 import com.qx.level0.lang.joos.parsing.StreamReader;
 import com.qx.level0.lang.joos.type.FieldHandlerFactory;
@@ -97,7 +97,7 @@ public class JOOS_Context {
 	 * @throws JOOS_ParsingException
 	 * @throws IOException
 	 */
-	public Object parse(Reader reader, boolean isVerbose) throws JOOS_ParsingException, IOException {
+	public Object parse(JOOS_Reader reader, boolean isVerbose) throws JOOS_ParsingException, IOException {
 		Parser parser = new Parser(this, new StreamReader(reader), isVerbose);
 		return parser.parse();
 	}
@@ -113,7 +113,7 @@ public class JOOS_Context {
 	 * @throws IllegalAccessException
 	 * @throws IOException
 	 */
-	public void compose(Writer writer, Object object, String indentSequence,  boolean isVerbose) 
+	public void compose(JOOS_Writer writer, Object object, String indentSequence,  boolean isVerbose) 
 			throws IllegalArgumentException, IllegalAccessException, IOException {
 		Composer composer = new Composer(this, writer, indentSequence, isVerbose);
 		composer.compose(object);

@@ -1,16 +1,15 @@
 package com.qx.level0.lang.joos.composing;
 
 import java.io.IOException;
-import java.io.Writer;
 
 import com.qx.level0.lang.joos.JOOS_Context;
 import com.qx.level0.lang.joos.type.TypeHandler;
 
 public class ComposingScope {
 
-	private JOOS_Context context;
+	protected JOOS_Context context;
 	
-	private Writer writer;
+	protected JOOS_Writer writer;
 
 	private char openingChar;
 
@@ -26,7 +25,7 @@ public class ComposingScope {
 
 	public ComposingScope(
 			JOOS_Context context,
-			Writer writer, 
+			JOOS_Writer writer, 
 			char openingChar, 
 			char closingChar,
 			String indent, 
@@ -48,7 +47,7 @@ public class ComposingScope {
 
 
 	public void open() throws IOException {
-		writer.append(openingChar);
+		writer.write(openingChar);
 	}
 
 	public void newLine() throws IOException {
@@ -57,24 +56,24 @@ public class ComposingScope {
 		 * handle previous line separator
 		 */
 		if(hasAlreadyLines) {
-			writer.append(',');
+			writer.write(',');
 		}
 		else {
 			hasAlreadyLines = true;
 		}
 
 		// append new line
-		writer.append('\n');
+		writer.write('\n');
 
 		// indent
-		writer.append(enclosedIndent);
+		writer.write(enclosedIndent);
 
 	}
 
 
 	public void append(String str) throws IOException {
 		// value
-		writer.append(str);
+		writer.write(str);
 	}
 	
 	public void append(char c) throws IOException {
@@ -84,13 +83,13 @@ public class ComposingScope {
 	public void close() throws IOException {
 		if(hasAlreadyLines) {
 			// append new line
-			writer.append('\n');
+			writer.write('\n');
 
 			// indent
-			writer.append(indent);
+			writer.write(indent);
 
 			// value
-			writer.append(closingChar);
+			writer.write(closingChar);
 		}
 	}
 

@@ -1,12 +1,12 @@
 package com.qx.lang.v2.testing;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 
 import com.qx.level0.lang.joos.JOOS_Context;
+import com.qx.level0.lang.joos.utilities.JOOS_BufferedFileWriter;
 
 public class LaunchComposingTest {
 
@@ -37,10 +37,12 @@ public class LaunchComposingTest {
 		context.discover(NewType.class);
 
 
+		
 		String pathname = "testing/V2_test_ouput.joos";
-		BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(pathname))));
-
-
+		RandomAccessFile file = new RandomAccessFile(new File(pathname), "rws");
+		
+		JOOS_BufferedFileWriter writer = new JOOS_BufferedFileWriter(file.getChannel(), StandardCharsets.UTF_8, 64);
+		
 		try {
 			context.compose(writer, nt, "\t", true);
 		}
@@ -49,5 +51,6 @@ public class LaunchComposingTest {
 		}
 
 		writer.close();
+		file.close();
 	}
 }
