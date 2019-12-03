@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 
 import com.qx.level0.lang.joos.JOOS_Context;
 import com.qx.level0.lang.joos.JOOS_ParsingException;
+import com.qx.level0.lang.joos.JOOS_Type;
 import com.qx.level0.lang.joos.composing.ComposingScope;
 
 
@@ -52,7 +53,13 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 
 	@Override
 	public void subDiscover(JOOS_Context context) {
-		context.discover(componentType);
+		
+		/*
+		 * discover component type if annotated (compatibility with generic)
+		 */
+		if(componentType.getAnnotation(JOOS_Type.class)!=null) {
+			context.discover(componentType);	
+		}
 	}
 
 	@Override
