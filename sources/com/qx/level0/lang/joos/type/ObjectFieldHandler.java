@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.qx.level0.lang.joos.JOOS_Context;
+import com.qx.level0.lang.joos.JOOS_Type;
 import com.qx.level0.lang.joos.composing.ComposingScope;
 
 public class ObjectFieldHandler extends FieldHandler {
@@ -38,7 +39,9 @@ public class ObjectFieldHandler extends FieldHandler {
 
 	@Override
 	public void subDiscover(JOOS_Context context) {
-		context.discover(fieldType);
+		if(fieldType.getAnnotation(JOOS_Type.class)!=null) {
+			context.discover(fieldType);	
+		}
 	}
 
 	@Override
