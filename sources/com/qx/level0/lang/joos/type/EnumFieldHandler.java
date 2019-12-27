@@ -38,7 +38,13 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 		scope.newLine();
 		scope.append(name);
 		scope.append(':');
-		scope.append(field.get(object).toString());
+		Object item = field.get(object);
+		if(item!=null) {
+			scope.append(item.toString());
+		}
+		else {
+			scope.append("NONE");	
+		}
 		return true;
 	}
 
