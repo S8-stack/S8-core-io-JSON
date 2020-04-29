@@ -1,6 +1,6 @@
 package com.qx.level0.lang.joos;
 
-public class Ws3dSyntax {
+public class JOOS_Syntax {
 
 	public static final char WHITE_SPACE = ' ';
 

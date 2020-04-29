@@ -3,7 +3,7 @@ package com.qx.level0.lang.joos.parsing;
 import java.io.IOException;
 
 import com.qx.level0.lang.joos.JOOS_ParsingException;
-import com.qx.level0.lang.joos.Ws3dSyntax;
+import com.qx.level0.lang.joos.JOOS_Syntax;
 
 
 public class StreamReader {
@@ -291,7 +291,7 @@ public class StreamReader {
 	}
 
 	public void skipWhiteSpace() throws IOException, JOOS_ParsingException {
-		while(c==Ws3dSyntax.WHITE_SPACE){
+		while(c==JOOS_Syntax.WHITE_SPACE){
 			readNext();
 		}
 	}
