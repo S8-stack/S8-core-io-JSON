@@ -1,4 +1,4 @@
-package com.s8.lang.joos.type.primitives;
+package com.s8.lang.joos.type;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -11,7 +11,6 @@ import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ParsingScope;
 import com.s8.lang.joos.parsing.PrimitiveScope;
 import com.s8.lang.joos.parsing.ParsingScope.OnParsedValue;
-import com.s8.lang.joos.type.FieldHandler;
 
 /**
  * 

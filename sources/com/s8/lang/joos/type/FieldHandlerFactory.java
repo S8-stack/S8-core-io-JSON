@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.s8.lang.joos.JOOS_Field;
+import com.s8.lang.joos.JOOS_PrimitiveExtension;
 import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.type.primitives.BooleanArrayFieldHandler;
 import com.s8.lang.joos.type.primitives.BooleanFieldHandler;
@@ -25,22 +26,18 @@ import com.s8.lang.joos.type.primitives.StringFieldHandler;
 
 public class FieldHandlerFactory {
 
-	public static abstract class Extension {
-
-		public abstract boolean isMatching(Class<?> fieldType);
-
-		public abstract FieldHandler build(String name, Field field); 
-	}
+	
 
 
-	private List<Extension> extensions = new ArrayList<>();
+	private final List<JOOS_PrimitiveExtension<?>> extensions;
 
-	public FieldHandlerFactory(Extension... extensions) {
+	public FieldHandlerFactory() {
 		super();
+		extensions = new ArrayList<JOOS_PrimitiveExtension<?>>();
 	}
 
-	public void add(Extension extension) {
-		this.extensions.add(extension);
+	public <T> void add(JOOS_PrimitiveExtension<T> extension) {
+		extensions.add(extension);
 	}
 
 
@@ -62,9 +59,9 @@ public class FieldHandlerFactory {
 		String name = annotation.name();
 		Class<?> fieldType = field.getType();
 
-		for(Extension extension : extensions) {
+		for(JOOS_PrimitiveExtension<?> extension : extensions) {
 			if(extension.isMatching(fieldType)) {
-				return extension.build(name, field);
+				return extension.createFieldHandler(name, field);
 			}
 		}
 

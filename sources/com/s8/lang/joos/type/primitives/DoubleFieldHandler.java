@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import com.s8.lang.joos.composing.ComposingScope;
 import com.s8.lang.joos.composing.JOOS_ComposingException;
 import com.s8.lang.joos.parsing.JOOS_ParsingException;
+import com.s8.lang.joos.type.PrimitiveFieldHandler;
 
 public class DoubleFieldHandler extends PrimitiveFieldHandler {
 	

@@ -9,6 +9,7 @@ import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ParsingScope;
 import com.s8.lang.joos.parsing.ParsingScope.OnParsedObject;
 import com.s8.lang.joos.parsing.primitives.ShortArrayScope;
+import com.s8.lang.joos.type.PrimitivesArrayFieldHandler;
 
 public class ShortArrayFieldHandler extends PrimitivesArrayFieldHandler {
 

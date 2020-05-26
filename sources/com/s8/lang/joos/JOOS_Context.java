@@ -27,10 +27,11 @@ public class JOOS_Context {
 
 	private Map<String, TypeHandler> typesByClassName = new HashMap<String, TypeHandler>();
 
-	private FieldHandlerFactory fieldHandlerFactory = new FieldHandlerFactory();
+	private final FieldHandlerFactory fieldHandlerFactory;
 
 	public JOOS_Context(){
 		super();
+		fieldHandlerFactory = new FieldHandlerFactory();
 	}
 
 
@@ -58,7 +59,12 @@ public class JOOS_Context {
 		return typeHandler;
 	}
 	
-	public void addFieldExtension(FieldHandlerFactory.Extension extension) {
+	
+	/**
+	 * 
+	 * @param extension
+	 */
+	public <T> void definePrimitiveExtension(JOOS_PrimitiveExtension<T> extension) {
 		fieldHandlerFactory.add(extension);
 	}
 
