@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ParsingScope;
 import com.s8.lang.joos.parsing.ParsingScope.OnParsedObject;
 import com.s8.lang.joos.parsing.StringArrayScope;
@@ -26,10 +26,9 @@ public class StringArrayFieldHandler extends PrimitivesArrayFieldHandler {
 			throws IOException, ArrayIndexOutOfBoundsException, IllegalArgumentException {
 		
 		String value = (String) Array.get(array, index);
-		scope.append('(');
-		scope.append(Integer.toString(value.length()));
-		scope.append(')');
+		scope.append('"');
 		scope.append(value);
+		scope.append('"');
 	}
 
 	

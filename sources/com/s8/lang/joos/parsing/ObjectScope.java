@@ -3,7 +3,6 @@ package com.s8.lang.joos.parsing;
 import java.lang.reflect.InvocationTargetException;
 
 import com.s8.lang.joos.JOOS_Context;
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.type.FieldHandler;
 import com.s8.lang.joos.type.TypeHandler;
 

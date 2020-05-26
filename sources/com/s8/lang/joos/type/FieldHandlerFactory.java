@@ -5,31 +5,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.s8.lang.joos.JOOS_Field;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
 
 
 
 public class FieldHandlerFactory {
-	
+
 	public static abstract class Extension {
-		
+
 		public abstract boolean isMatching(Class<?> fieldType);
-		
+
 		public abstract FieldHandler build(String name, Field field); 
 	}
-	
-	
+
+
 	private List<Extension> extensions = new ArrayList<>();
-	
+
 	public FieldHandlerFactory(Extension... extensions) {
 		super();
 	}
-	
+
 	public void add(Extension extension) {
 		this.extensions.add(extension);
 	}
-	
-	
-	
+
+
+
 
 	/**
 	 * 
@@ -37,21 +38,22 @@ public class FieldHandlerFactory {
 	 * @param field : the field itself
 	 * @param objectType : type of the parent object owning the field
 	 * @return
+	 * @throws JOOS_ParsingException 
 	 * @throws Exception
 	 */
-	public FieldHandler create(Field field) {
+	public FieldHandler create(Field field) throws JOOS_CompilingException {
 
 		JOOS_Field annotation = field.getAnnotation(JOOS_Field.class);
-		
+
 		String name = annotation.name();
 		Class<?> fieldType = field.getType();
-		
+
 		for(Extension extension : extensions) {
 			if(extension.isMatching(fieldType)) {
 				return extension.build(name, field);
 			}
 		}
-	
+
 		// primitive
 		if(fieldType.isPrimitive()){
 			if(fieldType == boolean.class){
@@ -109,7 +111,8 @@ public class FieldHandlerFactory {
 					return new DoubleArrayFieldHandler(name, field);
 				}
 				else {
-					throw new RuntimeException("Primitives array type not supported "+componentType);
+					throw new JOOS_CompilingException(field.getDeclaringClass(), 
+							"Primitives array type not supported "+componentType);
 				}
 			}
 			else if(componentType==String.class) {
@@ -119,6 +122,9 @@ public class FieldHandlerFactory {
 			else{
 				return new ObjectsArrayFieldHandler(name, field);
 			}
+		}
+		else if(List.class.isAssignableFrom(fieldType)) {
+			return new ObjectsListFieldHandler(name, field);
 		}
 		// default to object
 		else{

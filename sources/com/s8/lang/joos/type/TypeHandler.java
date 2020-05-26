@@ -13,6 +13,7 @@ import com.s8.lang.joos.JOOS_Context;
 import com.s8.lang.joos.JOOS_Field;
 import com.s8.lang.joos.JOOS_Type;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.composing.JOOS_ComposingException;
 
 /**
  * 
@@ -66,7 +67,7 @@ public class TypeHandler {
 	}
 
 
-	public void initialize(JOOS_Context context) {
+	public void initialize(JOOS_Context context) throws JOOS_CompilingException {
 
 		// get object annotation
 		JOOS_Type typeAnnotation = type.getAnnotation(JOOS_Type.class);
@@ -133,7 +134,7 @@ public class TypeHandler {
 	}
 
 
-	public void getSubTypes(JOOS_Context context, List<TypeHandler> types){
+	public void getSubTypes(JOOS_Context context, List<TypeHandler> types) throws JOOS_CompilingException{
 
 
 		TypeHandler subTypeHandler;
@@ -142,7 +143,7 @@ public class TypeHandler {
 		Class<?>[] subTypes = typeAnnotation.sub();
 		if(subTypes!=null){
 			for(Class<?> subType : subTypes){
-				subTypeHandler = context.get(subType);
+				subTypeHandler = context.discover(subType);
 				types.add(subTypeHandler);
 
 				// explore subTypes recursively				
@@ -174,7 +175,7 @@ public class TypeHandler {
 	
 	
 	public void compose(Object object, ComposingScope scope) 
-			throws IllegalArgumentException, IllegalAccessException, IOException {
+			throws JOOS_ComposingException, IOException {
 		
 		// declare type
 		scope.append('(');
@@ -182,7 +183,7 @@ public class TypeHandler {
 		scope.append(')');
 
 		// begin body
-		ComposingScope enclosedScope = scope.enterSubscope('{', '}');
+		ComposingScope enclosedScope = scope.enterSubscope('{', '}', true);
 		
 		// write field
 		enclosedScope.open();

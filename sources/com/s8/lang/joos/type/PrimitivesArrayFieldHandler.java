@@ -6,11 +6,12 @@ import java.lang.reflect.Field;
 
 import com.s8.lang.joos.JOOS_Context;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.composing.JOOS_ComposingException;
 
 public abstract class PrimitivesArrayFieldHandler extends FieldHandler {
 
 	private Class<?> componentType;
-	
+
 	public PrimitivesArrayFieldHandler(String name, Field field) {
 		super(name, field);
 		componentType = field.getType().getComponentType();
@@ -26,78 +27,80 @@ public abstract class PrimitivesArrayFieldHandler extends FieldHandler {
 	public void set(Object object, Object values) throws IllegalArgumentException, IllegalAccessException {
 		field.set(object, values);
 	}
-	
+
 
 	@Override
 	public Class<?> getSubType() {
 		return componentType;
 	}
-	
+
 	@Override
 	public void subDiscover(JOOS_Context context) {
 		// nothing to sub-discover
 	}
-	
+
 	/**
 	 * 
 	 * @param object the parent object
 	 * @param writer
 	 * @throws IOException
+	 * @throws JOOS_ComposingException 
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 */
 	@Override
-	public boolean compose(Object object, ComposingScope scope) throws IOException, IllegalArgumentException, IllegalAccessException {
+	public boolean compose(Object object, ComposingScope scope) throws IOException, JOOS_ComposingException {
 
 		// retrieve array
-		Object array = field.get(object);
+		Object array;
+		try {
+			array = field.get(object);
+		} 
+		catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			throw new JOOS_ComposingException(e.getMessage());
+		}
+		
 		if(array!=null) {
-			
-			scope.newLine();
-	
+
+			scope.newItem();
+
 			// field description
-			
+
 			scope.append(name);
-			scope.append(':');
+			scope.append(": ");
 			
 			int length = Array.getLength(array);
-			scope.append('(');
-			scope.append(Integer.toString(length));
-			scope.append(')');
 			
+			ComposingScope enclosedScope = scope.enterSubscope('[', ']', false);
 
-			ComposingScope enclosedScope = scope.enterSubscope('[', ']');
-			
-			
+
 			// write field
 			enclosedScope.open();
 			for(int index=0; index<length; index++) {
 
 				if(isItemValid(array, index)) {
-			
-					enclosedScope.newLine();
-					enclosedScope.append(Integer.toString(index));
-					enclosedScope.append(':');
+					enclosedScope.newItem();
 					composeItem(array, index, enclosedScope);					
 				}			
 			}
 			enclosedScope.close();
-			
+
 			return true;
 		}
 		else {
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * @param array
 	 * @param index 
 	 * @return flag indicating whether has produced something
 	 */
 	public abstract boolean isItemValid(Object array, int index);
-	
+
 	/**
 	 * 
 	 * @param array

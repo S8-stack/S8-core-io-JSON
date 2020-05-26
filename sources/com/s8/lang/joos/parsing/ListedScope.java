@@ -2,8 +2,6 @@ package com.s8.lang.joos.parsing;
 
 import java.io.IOException;
 
-import com.s8.lang.joos.JOOS_ParsingException;
-
 public abstract class ListedScope extends ParsingScope {
 
 	@Override

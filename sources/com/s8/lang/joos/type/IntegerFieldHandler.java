@@ -3,8 +3,9 @@ package com.s8.lang.joos.type;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.composing.JOOS_ComposingException;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
 
 public class IntegerFieldHandler extends PrimitiveFieldHandler {
 
@@ -25,12 +26,19 @@ public class IntegerFieldHandler extends PrimitiveFieldHandler {
 
 	@Override
 	public boolean compose(Object object, ComposingScope scope) 
-			throws IllegalArgumentException, IllegalAccessException, IOException  {
+			throws IOException, JOOS_ComposingException  {
 
-		scope.newLine();
+		scope.newItem();
 		scope.append(name);
-		scope.append(':');
-		scope.append(Integer.toString(field.getInt(object)));
+		scope.append(": ");
+		
+		try {
+			scope.append(Integer.toString(field.getInt(object)));
+		} 
+		catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+			e.printStackTrace();
+			throw new JOOS_ComposingException(e.getMessage());
+		}
 		return true;
 	}
 

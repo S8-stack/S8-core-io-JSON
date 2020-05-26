@@ -6,11 +6,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.s8.lang.joos.composing.Composer;
+import com.s8.lang.joos.composing.JOOS_ComposingException;
 import com.s8.lang.joos.composing.JOOS_Writer;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.JOOS_Reader;
 import com.s8.lang.joos.parsing.Parser;
 import com.s8.lang.joos.parsing.StreamReader;
 import com.s8.lang.joos.type.FieldHandlerFactory;
+import com.s8.lang.joos.type.JOOS_CompilingException;
 import com.s8.lang.joos.type.TypeHandler;
 
 
@@ -31,30 +34,7 @@ public class JOOS_Context {
 	}
 
 
-	public void discover(Class<?> type){
-		get(type);
-	}
-	
-	public void addFieldExtension(FieldHandlerFactory.Extension extension) {
-		fieldHandlerFactory.add(extension);
-	}
-
-
-	public FieldHandlerFactory getFieldFactory() {
-		return fieldHandlerFactory;
-	}
-
-	/**
-	 * 
-	 * @param type
-	 * @param JAVAIndexedTypes
-	 * @param localTypes
-	 * 
-	 * @return the type handler and create it if necessary
-	 * @throws Exception 
-	 */
-	public TypeHandler get(Class<?> type){
-		
+	public TypeHandler discover(Class<?> type) throws JOOS_CompilingException{
 		if(type==null){
 			throw new RuntimeException("[Ws3dContext] Type is null");
 		}
@@ -75,6 +55,42 @@ public class JOOS_Context {
 			
 			typeHandler.initialize(this);
 		}
+		return typeHandler;
+	}
+	
+	public void addFieldExtension(FieldHandlerFactory.Extension extension) {
+		fieldHandlerFactory.add(extension);
+	}
+
+
+	public FieldHandlerFactory getFieldFactory() {
+		return fieldHandlerFactory;
+	}
+
+	/**
+	 * 
+	 * @param type
+	 * @param JAVAIndexedTypes
+	 * @param localTypes
+	 * 
+	 * @return the type handler and create it if necessary
+	 * @throws JOOS_ComposingException 
+	 * @throws JOOS_ParsingException 
+	 * @throws Exception 
+	 */
+	public TypeHandler get(Class<?> type) throws JOOS_ComposingException {
+		
+		if(type==null){
+			throw new JOOS_ComposingException("[Ws3dContext] Type is null");
+		}
+		
+		JOOS_Type annotation = type.getAnnotation(JOOS_Type.class);
+		if(annotation==null){
+			throw new JOOS_ComposingException("[Ws3dContext] Type is not annotated: "+type);
+		}
+		
+		String name = annotation.name();
+		TypeHandler typeHandler = types.get(name);
 		return typeHandler;
 	}
 
@@ -112,9 +128,11 @@ public class JOOS_Context {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 * @throws IOException
+	 * @throws JOOS_CompilingException 
+	 * @throws JOOS_ComposingException 
 	 */
 	public void compose(JOOS_Writer writer, Object object, String indentSequence,  boolean isVerbose) 
-			throws IllegalArgumentException, IllegalAccessException, IOException {
+			throws IOException,  JOOS_ComposingException {
 		Composer composer = new Composer(this, writer, indentSequence, isVerbose);
 		composer.compose(object);
 	}

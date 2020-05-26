@@ -22,7 +22,7 @@ public class Composer {
 	}
 
 
-	public void compose(Object object) throws IllegalArgumentException, IllegalAccessException, IOException {
+	public void compose(Object object) throws IOException, JOOS_ComposingException {
 		writer.write("root:");
 		ComposingScope scope = new RootComposingScope(context, writer, indentSequence);
 		

@@ -5,8 +5,9 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.composing.JOOS_ComposingException;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
 
 public class EnumFieldHandler extends PrimitiveFieldHandler {
 
@@ -33,12 +34,20 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 
 	@Override
 	public boolean compose(Object object, ComposingScope scope) 
-			throws IllegalArgumentException, IllegalAccessException, IOException  {
+			throws IOException, JOOS_ComposingException  {
 
-		scope.newLine();
+		scope.newItem();
 		scope.append(name);
-		scope.append(':');
-		Object item = field.get(object);
+		scope.append(": ");
+		
+		Object item;
+		try {
+			item = field.get(object);
+		} 
+		catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			throw new JOOS_ComposingException(e.getMessage());
+		}
 		if(item!=null) {
 			scope.append(item.toString());
 		}

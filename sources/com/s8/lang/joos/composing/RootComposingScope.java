@@ -9,13 +9,14 @@ public class RootComposingScope extends ComposingScope {
 			JOOS_Context context,
 			JOOS_Writer writer, 
 			String incrementalIndent) {
-		super(context, writer, '{', '}', "", incrementalIndent);
+		super(context, writer, '{', '}', true, "", incrementalIndent);
 
 	}
 
 	@Override
-	public ComposingScope enterSubscope(char openingChar, char closingChar) {
-		return new ComposingScope(context, writer, openingChar, closingChar, "", incrementalIndent);
+	public ComposingScope enterSubscope(char openingChar, char closingChar, boolean isInsertingLineFeed) {
+		return new ComposingScope(context, writer, openingChar, closingChar, 
+				isInsertingLineFeed, "", incrementalIndent);
 	}
 
 }

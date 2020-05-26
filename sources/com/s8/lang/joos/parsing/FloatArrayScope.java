@@ -1,6 +1,5 @@
 package com.s8.lang.joos.parsing;
 
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.ParsingException;
 
 public class FloatArrayScope extends PrimitivesArrayScope<Float> {

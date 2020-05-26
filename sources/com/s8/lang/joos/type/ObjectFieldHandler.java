@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.s8.lang.joos.JOOS_Context;
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.JOOS_Type;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.composing.JOOS_ComposingException;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ObjectScope;
 import com.s8.lang.joos.parsing.ParsingScope;
 import com.s8.lang.joos.parsing.ParsingScope.OnParsedObject;
@@ -32,27 +33,34 @@ public class ObjectFieldHandler extends FieldHandler {
 		return fieldType;
 	}
 
-	
+
 
 	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return field.get(object);
 	}
 
 	@Override
-	public void subDiscover(JOOS_Context context) {
+	public void subDiscover(JOOS_Context context) throws JOOS_CompilingException {
 		if(fieldType.getAnnotation(JOOS_Type.class)!=null) {
 			context.discover(fieldType);	
 		}
 	}
 
 	@Override
-	public boolean compose(Object object, ComposingScope scope) 
-			throws IOException, IllegalArgumentException, IllegalAccessException {
+	public boolean compose(Object object, ComposingScope scope) throws JOOS_ComposingException, IOException {
 
-		Object value = field.get(object);
+		Object value = null;
+		try {
+			value = field.get(object);
+		} 
+		catch (IllegalArgumentException | IllegalAccessException e) {
+			e.printStackTrace();
+			throw new JOOS_ComposingException(e.getMessage());
+		}
+
 		if(value!=null) {
 			// declare type
-			scope.newLine();
+			scope.newItem();
 			scope.append(name);
 			scope.append(':');
 

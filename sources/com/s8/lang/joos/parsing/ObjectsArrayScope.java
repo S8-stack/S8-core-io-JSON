@@ -1,22 +1,24 @@
 package com.s8.lang.joos.parsing;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.s8.lang.joos.JOOS_ParsingException;
 
 public class ObjectsArrayScope extends ListedScope {
 
 
-	private OnParsedObject callback;
+	private OnParsed callback;
 	
 	private Class<?> componentType;
 	
 	private List<Object> values;
 	
+	
+	public interface OnParsed {
+		public void set(List<Object> values) throws JOOS_ParsingException;
+	}
+	
 
-	public ObjectsArrayScope(Class<?> componentType, OnParsedObject callback) {
+	public ObjectsArrayScope(Class<?> componentType, OnParsed callback) {
 		super();
 		this.callback = callback;
 		this.componentType = componentType;
@@ -46,12 +48,7 @@ public class ObjectsArrayScope extends ListedScope {
 
 	@Override
 	public void close() throws JOOS_ParsingException {
-		int length = values.size();
-		Object array = Array.newInstance(componentType, length);
-		for(int index=0; index<length; index++) {
-			Array.set(array, index, values.get(index));
-		}
-		callback.set(array);
+		callback.set(values);
 	}
 
 

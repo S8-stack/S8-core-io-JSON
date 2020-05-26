@@ -2,8 +2,8 @@ package com.s8.lang.joos.type;
 
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 import com.s8.lang.joos.JOOS_Context;
@@ -12,6 +12,7 @@ import com.s8.lang.joos.composing.ComposingScope;
 import com.s8.lang.joos.composing.JOOS_ComposingException;
 import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ObjectsArrayScope;
+import com.s8.lang.joos.parsing.ObjectsArrayScope.OnParsed;
 import com.s8.lang.joos.parsing.ParsingScope;
 
 
@@ -20,20 +21,21 @@ import com.s8.lang.joos.parsing.ParsingScope;
  * @author pc
  *
  */
-public class ObjectsArrayFieldHandler extends FieldHandler {
+public class ObjectsListFieldHandler extends FieldHandler {
 
 
 	private Class<?> componentType;
 
-
-	public ObjectsArrayFieldHandler(String name, Field field) {
+	public ObjectsListFieldHandler(String name, Field field) {
 		super(name, field);
-		this.componentType = field.getType().getComponentType();
+
+		componentType =
+				(Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 	}
 
-	public void set(Object object, Object valuesArray) throws JOOS_ParsingException {
+	public void set(Object object, Object value) throws JOOS_ParsingException {
 		try {
-			field.set(object, valuesArray);
+			field.set(object, value);
 		} catch (IllegalAccessException | IllegalArgumentException e) {
 			throw new JOOS_ParsingException("Cannot set Object array due to "+e.getMessage());
 		}
@@ -53,7 +55,7 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 
 	@Override
 	public void subDiscover(JOOS_Context context) throws JOOS_CompilingException {
-		
+
 		/*
 		 * discover component type if annotated (compatibility with generic)
 		 */
@@ -62,37 +64,36 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public boolean compose(Object object, ComposingScope scope) throws IOException, JOOS_ComposingException {
+	public boolean compose(Object object, ComposingScope scope)
+			throws IOException, JOOS_ComposingException {
 
 		// retrieve array
-		Object array;
+		List<Object> list = null;
 		try {
-			array = field.get(object);
+			list = (List<Object>) field.get(object);
 		} 
 		catch (IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}
-		
-		if(array!=null) {
+
+
+		if(list!=null) {
 
 			// field description
 			scope.newItem();
 			scope.append(name);
 			scope.append(':');
-			
-			int length = Array.getLength(array);
 
 			ComposingScope enclosedScope = scope.enterSubscope('[', ']', true);
-			
+
 			enclosedScope.open();
-			Object item;
-			for(int index=0; index<length; index++) {
-				item = Array.get(array, index);
+			for(Object item : list) {
 				if(item!=null) {
-					
+
 					enclosedScope.newItem();
+
 					TypeHandler typeHandler = enclosedScope.getTypeHandler(item);
 					typeHandler.compose(item, enclosedScope);					
 				}			
@@ -107,15 +108,11 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 
 	@Override
 	public ParsingScope openScope(Object object) {
-		return new ObjectsArrayScope(getSubType(), new ObjectsArrayScope.OnParsed() {
+		return new ObjectsArrayScope(componentType, new OnParsed() {
+
 			@Override
 			public void set(List<Object> values) throws JOOS_ParsingException {
-				int length = values.size();
-				Object array = Array.newInstance(componentType, length);
-				for(int index=0; index<length; index++) {
-					Array.set(array, index, values.get(index));
-				}
-				ObjectsArrayFieldHandler.this.set(object, array);
+				ObjectsListFieldHandler.this.set(object, values);
 			}
 		});
 	}

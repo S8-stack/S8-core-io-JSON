@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ParsingScope;
 import com.s8.lang.joos.parsing.ParsingScope.OnParsedObject;
 import com.s8.lang.joos.parsing.ShortArrayScope;

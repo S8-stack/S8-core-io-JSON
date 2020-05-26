@@ -4,9 +4,10 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.s8.lang.joos.JOOS_Context;
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.ParsingException;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.composing.JOOS_ComposingException;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ParsingScope;
 import com.s8.lang.joos.parsing.PrimitiveScope;
 import com.s8.lang.joos.parsing.ParsingScope.OnParsedValue;
@@ -59,10 +60,10 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 * @throws IOException
+	 * @throws JOOS_ComposingException 
 	 */
 	@Override
-	public abstract boolean compose(Object object, ComposingScope scope) 
-			throws IllegalArgumentException, IllegalAccessException, IOException;
+	public abstract boolean compose(Object object, ComposingScope scope) throws IOException, JOOS_ComposingException;
 
 
 	

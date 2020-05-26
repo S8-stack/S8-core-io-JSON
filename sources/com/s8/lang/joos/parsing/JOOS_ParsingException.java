@@ -1,6 +1,4 @@
-package com.s8.lang.joos;
-
-import com.s8.lang.joos.parsing.StreamReader;
+package com.s8.lang.joos.parsing;
 
 public class JOOS_ParsingException extends Exception {
 

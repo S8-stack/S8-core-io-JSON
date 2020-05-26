@@ -2,7 +2,6 @@ package com.s8.lang.joos.parsing;
 
 import java.io.IOException;
 
-import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.ParsingException;
 
 public class PrimitiveScope extends ParsingScope {

@@ -8,7 +8,7 @@ import com.s8.lang.joos.type.TypeHandler;
 public class ComposingScope {
 
 	protected JOOS_Context context;
-	
+
 	protected JOOS_Writer writer;
 
 	private char openingChar;
@@ -18,18 +18,22 @@ public class ComposingScope {
 	protected String indent;
 
 	protected String enclosedIndent;
-	
+
 	protected String incrementalIndent;
 
 	private boolean hasAlreadyLines = false;
+
+	private boolean isInsertingLineFeed = false;
 
 	public ComposingScope(
 			JOOS_Context context,
 			JOOS_Writer writer, 
 			char openingChar, 
 			char closingChar,
+			boolean isInsertingLineFeed,
 			String indent, 
-			String incrementalIndent) {
+			String incrementalIndent
+			) {
 		super();
 
 		this.context = context;
@@ -41,6 +45,7 @@ public class ComposingScope {
 		this.indent = indent;
 		this.incrementalIndent = incrementalIndent;
 		this.enclosedIndent = indent+incrementalIndent;
+		this.isInsertingLineFeed = isInsertingLineFeed;
 
 	}
 
@@ -50,7 +55,7 @@ public class ComposingScope {
 		writer.write(openingChar);
 	}
 
-	public void newLine() throws IOException {
+	public void newItem() throws IOException {
 
 		/*
 		 * handle previous line separator
@@ -62,11 +67,18 @@ public class ComposingScope {
 			hasAlreadyLines = true;
 		}
 
-		// append new line
-		writer.write('\n');
+		if(isInsertingLineFeed) {
+			// append new line
+			writer.write('\n');
 
-		// indent
-		writer.write(enclosedIndent);
+			// indent
+			writer.write(enclosedIndent);	
+		}
+		else {
+			// append white space
+			writer.write(' ');
+		}
+
 
 	}
 
@@ -75,18 +87,21 @@ public class ComposingScope {
 		// value
 		writer.write(str);
 	}
-	
+
 	public void append(char c) throws IOException {
 		writer.write(c);
 	}
 
 	public void close() throws IOException {
 		if(hasAlreadyLines) {
-			// append new line
-			writer.write('\n');
 
-			// indent
-			writer.write(indent);
+			if(isInsertingLineFeed) {
+				// append new line
+				writer.write('\n');
+
+				// indent
+				writer.write(indent);		
+			}
 
 			// value
 			writer.write(closingChar);
@@ -94,17 +109,18 @@ public class ComposingScope {
 	}
 
 
-	public ComposingScope enterSubscope(char openingChar, char closingChar) {
-		return new ComposingScope(context, writer, openingChar, closingChar, enclosedIndent, incrementalIndent);
+	public ComposingScope enterSubscope(char openingChar, char closingChar, boolean isInsertingLineFeed) {
+		return new ComposingScope(context, writer, openingChar, closingChar, 
+				isInsertingLineFeed, enclosedIndent, incrementalIndent);
 	}
 
 
 
 
-	public TypeHandler getTypeHandler(Object object) {
+	public TypeHandler getTypeHandler(Object object) throws JOOS_ComposingException {
 		return context.get(object.getClass());
 	}
 
 
-	
+
 }
