@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.s8.lang.joos.JOOS_Context;
+import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.JOOS_Type;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.parsing.ObjectScope;
+import com.s8.lang.joos.parsing.ParsingScope;
+import com.s8.lang.joos.parsing.ParsingScope.OnParsedObject;
 
 public class ObjectFieldHandler extends FieldHandler {
 
@@ -28,10 +32,7 @@ public class ObjectFieldHandler extends FieldHandler {
 		return fieldType;
 	}
 
-	@Override
-	public ScopeType getScopeType() {
-		return ScopeType.OBJECT;
-	}
+	
 
 	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return field.get(object);
@@ -63,7 +64,20 @@ public class ObjectFieldHandler extends FieldHandler {
 		else {
 			return false;
 		}
+	}
 
-
+	@Override
+	public ParsingScope openScope(Object object) {
+		return new ObjectScope(new OnParsedObject() {
+			@Override
+			public void set(Object value) throws JOOS_ParsingException {
+				try {
+					ObjectFieldHandler.this.set(object, value);
+				}
+				catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new JOOS_ParsingException("Failed to set object due to "+e.getMessage());
+				}
+			}	
+		});
 	}
 }

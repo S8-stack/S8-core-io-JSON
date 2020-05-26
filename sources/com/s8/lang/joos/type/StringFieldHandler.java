@@ -3,7 +3,7 @@ package com.s8.lang.joos.type;
 import java.io.IOException;
 import java.lang.reflect.Field;
 
-import com.s8.lang.joos.ParsingException;
+import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.composing.ComposingScope;
 
 public class StringFieldHandler extends PrimitiveFieldHandler {
@@ -14,11 +14,11 @@ public class StringFieldHandler extends PrimitiveFieldHandler {
 
 
 	@Override
-	public void parse(Object object, String value) throws ParsingException {
+	public void parse(Object object, String value) throws JOOS_ParsingException {
 		try {
 			field.set(object, value);
 		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new ParsingException("Cannot deserialize String due to: "+e.getMessage());
+			throw new JOOS_ParsingException("Cannot deserialize String due to: "+e.getMessage());
 		}
 	}
 	

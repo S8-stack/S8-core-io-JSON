@@ -66,7 +66,8 @@ public class StreamReader {
 	 */
 	public void check(char c) throws JOOS_ParsingException {
 		if(this.c!=c){
-			throw new JOOS_ParsingException(c, line, column, "Unexpected sequence encountered while deserializing");
+			throw new JOOS_ParsingException((char) this.c, line, column,
+					"Expected char was: "+c);
 		}
 	}
 
@@ -290,7 +291,7 @@ public class StreamReader {
 		}
 	}
 
-	public void skipWhiteSpace() throws IOException, JOOS_ParsingException {
+	public void skipWhiteSpaces() throws IOException, JOOS_ParsingException {
 		while(c==JOOS_Syntax.WHITE_SPACE){
 			readNext();
 		}
@@ -337,5 +338,11 @@ public class StreamReader {
 
 	public boolean isFinished(){
 		return c==-1;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return "currently reading char: "+((char) c)+" at line="+line+", column="+column;
 	}
 }

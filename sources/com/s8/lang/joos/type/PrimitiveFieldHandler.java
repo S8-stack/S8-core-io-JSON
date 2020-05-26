@@ -4,8 +4,12 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.s8.lang.joos.JOOS_Context;
+import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.ParsingException;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.parsing.ParsingScope;
+import com.s8.lang.joos.parsing.PrimitiveScope;
+import com.s8.lang.joos.parsing.ParsingScope.OnParsedValue;
 
 /**
  * 
@@ -33,9 +37,17 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	 * @throws ParsingException 
 	 * @throws Exception
 	 */
-	public abstract void parse(Object object, String value) throws ParsingException;
+	public abstract void parse(Object object, String value) throws JOOS_ParsingException;
 	
 	
+	@Override
+	public ParsingScope openScope(Object object) {
+		return new PrimitiveScope(new OnParsedValue() {
+			public @Override void set(String value) throws JOOS_ParsingException {
+				parse(object, value);
+			}
+		});
+	}
 	
 	
 	
@@ -43,7 +55,7 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	 * 
 	 * @param object
 	 * @param writer
-	 * @return has actually ouput something
+	 * @return has actually output something
 	 * @throws IllegalArgumentException
 	 * @throws IllegalAccessException
 	 * @throws IOException
@@ -52,17 +64,13 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	public abstract boolean compose(Object object, ComposingScope scope) 
 			throws IllegalArgumentException, IllegalAccessException, IOException;
 
-	//public abstract String get(Object object) throws IllegalArgumentException, IllegalAccessException;
 
+	
 	@Override
 	public Class<?> getSubType() {
 		return null;
 	}
 	
-	@Override
-	public ScopeType getScopeType() {
-		return ScopeType.PRIMITIVE;
-	}
 	
 	
 	@Override

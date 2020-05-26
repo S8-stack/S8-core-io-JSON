@@ -1,25 +1,17 @@
 package com.s8.lang.joos.parsing;
 
+import java.lang.reflect.InvocationTargetException;
+
+import com.s8.lang.joos.JOOS_Context;
 import com.s8.lang.joos.JOOS_ParsingException;
-import com.s8.lang.joos.ParsingException;
 import com.s8.lang.joos.type.FieldHandler;
-import com.s8.lang.joos.type.ObjectFieldHandler;
-import com.s8.lang.joos.type.ObjectsArrayFieldHandler;
-import com.s8.lang.joos.type.PrimitiveFieldHandler;
-import com.s8.lang.joos.type.PrimitivesArrayFieldHandler;
 import com.s8.lang.joos.type.TypeHandler;
-import com.s8.lang.joos.type.FieldHandler.ScopeType;
 
-public class ObjectScope extends ParsingScope {
-
-	public abstract static class Enclosing {
-
-		public abstract void set(Object value) throws JOOS_ParsingException; 
-
-	}
+public class ObjectScope extends MappedScope {
 
 
-	private Enclosing enclosing;
+
+	private OnParsedObject callback;
 
 	public TypeHandler handler;
 
@@ -27,9 +19,9 @@ public class ObjectScope extends ParsingScope {
 
 
 
-	public ObjectScope(Enclosing enclosing) {
+	public ObjectScope(OnParsedObject enclosing) {
 		super();
-		this.enclosing = enclosing;
+		this.callback = enclosing;
 	}
 
 
@@ -38,86 +30,39 @@ public class ObjectScope extends ParsingScope {
 		return object;
 	}
 
-	public void define(TypeHandler typeHandler) {
-		this.handler = typeHandler;
-		try {
+	@Override
+	public void define(String definition, JOOS_Context context) throws InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 
-			// create object of this scope
-			object = typeHandler.createInstance();
+		handler = context.get(definition);
 
-			// set object
-			enclosing.set(object);
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
+		// create object of this scope
+		object = handler.createInstance();
+
 	}
 
 
 
 	@Override
-	public ParsingScope enter(String name) throws JOOS_ParsingException {
-
-
+	public ParsingScope openEntry(String name) throws JOOS_ParsingException {
 		FieldHandler fieldHandler = handler.getFieldHandler(name);
 		if(fieldHandler==null){
 			throw new JOOS_ParsingException("Unknown field: "+name);
 		}
-
-		switch(fieldHandler.getScopeType()){
-
-		case PRIMITIVE: return new PrimitiveScope(new PrimitiveScope.Enclosing() {
-
-			@Override
-			public void set(String value) throws JOOS_ParsingException, ParsingException {
-				((PrimitiveFieldHandler) fieldHandler).parse(object, value);
-			}
-		});
-
-		case OBJECT: return new ObjectScope(new Enclosing() {
-			@Override
-			public void set(Object value) throws JOOS_ParsingException {
-				try {
-					((ObjectFieldHandler) fieldHandler).set(object, value);
-				}
-				catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new JOOS_ParsingException("Failed to set object due to "+e.getMessage());
-				}
-			}	
-		});
-
-		case PRIMITIVES_ARRAY: return new PrimitivesArrayScope(new PrimitivesArrayScope.Enclosing() {
-
-			@Override
-			public void set(Object value) throws IllegalArgumentException, IllegalAccessException {
-				((PrimitivesArrayFieldHandler) fieldHandler).set(object, value);
-			}
-		}, ((PrimitivesArrayFieldHandler) fieldHandler).getSubType());
-
-
-		case OBJECTS_ARRAY: return new ObjectsArrayScope(new ObjectsArrayScope.Enclosing() {
-
-			@Override
-			public void set(Object value) throws JOOS_ParsingException {
-				((ObjectsArrayFieldHandler) fieldHandler).set(object, value);
-			}
-
-		}, ((ObjectsArrayFieldHandler) fieldHandler).getSubType());
-
-
-		default : throw new JOOS_ParsingException("Impossible to generate setter");
-		
-		}
+		return fieldHandler.openScope(object);
 	}
+
 
 
 	@Override
-	public ScopeType getType() {
-		return ScopeType.OBJECT;
+	public void close() throws JOOS_ParsingException {
+		callback.set(object);
 	}
-	
+
+
+
 	@Override
-	public boolean isClosedBy(char c) {
-		return c=='}';
+	public boolean isDefinable() {
+		return true;
 	}
+
 }

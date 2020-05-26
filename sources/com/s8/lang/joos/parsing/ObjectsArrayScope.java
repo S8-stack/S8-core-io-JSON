@@ -1,60 +1,69 @@
 package com.s8.lang.joos.parsing;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.s8.lang.joos.JOOS_ParsingException;
-import com.s8.lang.joos.type.FieldHandler.ScopeType;
 
-public class ObjectsArrayScope extends ParsingScope {
+public class ObjectsArrayScope extends ListedScope {
 
-	public abstract static class Enclosing {
 
-		public abstract void set(Object value) throws JOOS_ParsingException;
-	}
-
-	
-	private Enclosing enclosing;
+	private OnParsedObject callback;
 	
 	private Class<?> componentType;
 	
-	private Object array;
+	private List<Object> values;
 	
 
-	public ObjectsArrayScope(Enclosing enclosing, Class<?> componentType) throws JOOS_ParsingException {
+	public ObjectsArrayScope(Class<?> componentType, OnParsedObject callback) {
 		super();
-		this.enclosing = enclosing;
+		this.callback = callback;
 		this.componentType = componentType;
+		this.values = new ArrayList<Object>();
 	}
 	
+	
+	public Class<?> getComponentType(){
+		return componentType;
+	}
 
-	public void define(int length) throws JOOS_ParsingException {
-		array = Array.newInstance(componentType, length);
-		enclosing.set(array);
-	}
-	
 	@Override
-	public ParsingScope enter(String declarator) throws JOOS_ParsingException {
-		
-		int index = Integer.valueOf(declarator);
-		
-		return new ObjectScope(new ObjectScope.Enclosing() {
-			
-			@Override
-			public void set(Object value) throws JOOS_ParsingException {
-				Array.set(array, index, value);
+	public ParsingScope openItem() throws JOOS_ParsingException {
+		return new ObjectScope(new ObjectScope.OnParsedObject() {
+			public @Override void set(Object value) {
+				values.add(value);
 			}
 		});
 	}
 
 
 	@Override
-	public ScopeType getType() {
-		return ScopeType.OBJECTS_ARRAY;
-	}
-
-	@Override
 	public boolean isClosedBy(char c) {
 		return c==']';
+	}
+
+
+	@Override
+	public void close() throws JOOS_ParsingException {
+		int length = values.size();
+		Object array = Array.newInstance(componentType, length);
+		for(int index=0; index<length; index++) {
+			Array.set(array, index, values.get(index));
+		}
+		callback.set(array);
+	}
+
+
+	@Override
+	public boolean isDefinable() {
+		return false;
+	}
+
+
+	@Override
+	public void define(String definition) {
+		// node definition
 	}
 
 }

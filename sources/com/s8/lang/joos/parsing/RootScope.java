@@ -1,7 +1,8 @@
 package com.s8.lang.joos.parsing;
 
+import java.io.IOException;
+
 import com.s8.lang.joos.JOOS_ParsingException;
-import com.s8.lang.joos.type.FieldHandler.ScopeType;
 
 public class RootScope extends ParsingScope {
 
@@ -9,29 +10,56 @@ public class RootScope extends ParsingScope {
 
 	public RootScope() {
 		super();
-	}
+		state = new State() {
+			
+			@Override
+			public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
+					throws JOOS_ParsingException, IOException {
 
-	@Override
-	public ParsingScope enter(String name) throws JOOS_ParsingException {
-		
-		if(name.equals("root")){
-			return new ObjectScope(new ObjectScope.Enclosing() {
+				// initiate
+				reader.readNext();
 
-				@Override
-				public void set(Object value) throws JOOS_ParsingException {
-					result = value;
-				}
+				// skip leading white spaces
+				reader.skipWhiteSpaces();
 				
-			});
-		}
-		else{
-			throw new JOOS_ParsingException("First declaration must be root");
-		}
+				String name = reader.until(new char[] { ':' }, null, new char[] { '}', ')', '{', '('});
+				
+				if(name.equals("root")){
+					
+					// consume ':'
+					reader.readNext();
+					reader.skipWhiteSpaces();
+					
+					parser.pushScope(new ObjectScope(new OnParsedObject() {
+						
+						@Override
+						public void set(Object value) throws JOOS_ParsingException {
+							result = value;
+						}
+					}));
+					
+					state = new State() {
+						
+						@Override
+						public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
+								throws JOOS_ParsingException, IOException {
+							parser.popScope();
+							return false;
+						}
+					};
+				}
+				else{
+					throw new JOOS_ParsingException("First declaration must be root, read: >"+name+"<");
+				}
+				return false;
+			}
+		};
 	}
+
 
 	@Override
 	public ScopeType getType() {
-		return ScopeType.OBJECT;
+		return ScopeType.MAPPED;
 	}
 
 	@Override

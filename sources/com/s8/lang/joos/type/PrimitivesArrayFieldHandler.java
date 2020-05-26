@@ -34,11 +34,6 @@ public abstract class PrimitivesArrayFieldHandler extends FieldHandler {
 	}
 	
 	@Override
-	public ScopeType getScopeType() {
-		return ScopeType.PRIMITIVES_ARRAY;
-	}
-
-	@Override
 	public void subDiscover(JOOS_Context context) {
 		// nothing to sub-discover
 	}

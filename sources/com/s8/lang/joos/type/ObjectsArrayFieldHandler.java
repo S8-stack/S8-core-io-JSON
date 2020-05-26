@@ -9,6 +9,9 @@ import com.s8.lang.joos.JOOS_Context;
 import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.JOOS_Type;
 import com.s8.lang.joos.composing.ComposingScope;
+import com.s8.lang.joos.parsing.ObjectsArrayScope;
+import com.s8.lang.joos.parsing.ParsingScope;
+import com.s8.lang.joos.parsing.ParsingScope.OnParsedObject;
 
 
 /**
@@ -46,10 +49,6 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 		return componentType;
 	}
 
-	@Override
-	public ScopeType getScopeType() {
-		return ScopeType.OBJECTS_ARRAY;
-	}
 
 	@Override
 	public void subDiscover(JOOS_Context context) {
@@ -102,5 +101,17 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 		else {
 			return false;
 		}
+	}
+
+	@Override
+	public ParsingScope openScope(Object object) {
+		return new ObjectsArrayScope(getSubType(), new OnParsedObject() {
+
+			@Override
+			public void set(Object value) throws JOOS_ParsingException {
+				ObjectsArrayFieldHandler.this.set(object, value);
+			}
+
+		});
 	}
 }

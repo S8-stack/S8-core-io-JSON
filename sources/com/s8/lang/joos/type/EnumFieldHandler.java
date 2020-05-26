@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.s8.lang.joos.ParsingException;
+import com.s8.lang.joos.JOOS_ParsingException;
 import com.s8.lang.joos.composing.ComposingScope;
 
 public class EnumFieldHandler extends PrimitiveFieldHandler {
@@ -23,11 +23,11 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 
 
 	@Override
-	public void parse(Object object, String value) throws ParsingException{
+	public void parse(Object object, String value) throws JOOS_ParsingException {
 		try {
 			field.set(object, map.get(value));
 		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new ParsingException("Cannot set interger due to "+e.getMessage());
+			throw new JOOS_ParsingException("Cannot set interger due to "+e.getMessage());
 		}
 	}
 
