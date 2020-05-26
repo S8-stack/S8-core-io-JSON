@@ -1,18 +1,18 @@
-package com.s8.lang.joos.type;
+package com.s8.lang.joos.type.primitives;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 
 import com.s8.lang.joos.composing.ComposingScope;
-import com.s8.lang.joos.parsing.FloatArrayScope;
 import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ParsingScope;
 import com.s8.lang.joos.parsing.ParsingScope.OnParsedObject;
+import com.s8.lang.joos.parsing.primitives.LongArrayScope;
 
-public class FloatArrayFieldHandler extends PrimitivesArrayFieldHandler {
+public class LongArrayFieldHandler extends PrimitivesArrayFieldHandler {
 
-	public FloatArrayFieldHandler(String name, Field field) {
+	public LongArrayFieldHandler(String name, Field field) {
 		super(name, field);
 	}
 
@@ -24,16 +24,16 @@ public class FloatArrayFieldHandler extends PrimitivesArrayFieldHandler {
 	@Override
 	public void composeItem(Object array, int index, ComposingScope scope) 
 			throws IOException, ArrayIndexOutOfBoundsException, IllegalArgumentException {
-		scope.append(Float.toString(Array.getFloat(array, index)));
+		scope.append(Long.toString(Array.getLong(array, index)));
 	}
-
+	
 	@Override
 	public ParsingScope openScope(Object object) {
-		return new FloatArrayScope(new OnParsedObject() {
+		return new LongArrayScope(new OnParsedObject() {
 			@Override
 			public void set(Object value) throws JOOS_ParsingException {
 				try {
-					FloatArrayFieldHandler.this.set(object, value);
+					LongArrayFieldHandler.this.set(object, value);
 				}
 				catch (IllegalArgumentException | IllegalAccessException e) {
 					throw new JOOS_ParsingException("Failed to set object due to "+e.getMessage());
@@ -41,4 +41,5 @@ public class FloatArrayFieldHandler extends PrimitivesArrayFieldHandler {
 			}	
 		});
 	}
+
 }

@@ -1,4 +1,4 @@
-package com.s8.lang.joos.type;
+package com.s8.lang.joos.type.primitives;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import com.s8.lang.joos.JOOS_Context;
 import com.s8.lang.joos.composing.ComposingScope;
 import com.s8.lang.joos.composing.JOOS_ComposingException;
+import com.s8.lang.joos.type.FieldHandler;
 
 public abstract class PrimitivesArrayFieldHandler extends FieldHandler {
 

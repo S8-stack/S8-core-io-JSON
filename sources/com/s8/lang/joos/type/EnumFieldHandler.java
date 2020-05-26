@@ -8,6 +8,7 @@ import java.util.Map;
 import com.s8.lang.joos.composing.ComposingScope;
 import com.s8.lang.joos.composing.JOOS_ComposingException;
 import com.s8.lang.joos.parsing.JOOS_ParsingException;
+import com.s8.lang.joos.type.primitives.PrimitiveFieldHandler;
 
 public class EnumFieldHandler extends PrimitiveFieldHandler {
 

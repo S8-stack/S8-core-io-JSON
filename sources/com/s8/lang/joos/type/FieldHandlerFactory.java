@@ -6,6 +6,20 @@ import java.util.List;
 
 import com.s8.lang.joos.JOOS_Field;
 import com.s8.lang.joos.parsing.JOOS_ParsingException;
+import com.s8.lang.joos.type.primitives.BooleanArrayFieldHandler;
+import com.s8.lang.joos.type.primitives.BooleanFieldHandler;
+import com.s8.lang.joos.type.primitives.DoubleArrayFieldHandler;
+import com.s8.lang.joos.type.primitives.DoubleFieldHandler;
+import com.s8.lang.joos.type.primitives.FloatArrayFieldHandler;
+import com.s8.lang.joos.type.primitives.FloatFieldHandler;
+import com.s8.lang.joos.type.primitives.IntegerArrayFieldHandler;
+import com.s8.lang.joos.type.primitives.IntegerFieldHandler;
+import com.s8.lang.joos.type.primitives.LongArrayFieldHandler;
+import com.s8.lang.joos.type.primitives.LongFieldHandler;
+import com.s8.lang.joos.type.primitives.ShortArrayFieldHandler;
+import com.s8.lang.joos.type.primitives.ShortFieldHandler;
+import com.s8.lang.joos.type.primitives.StringArrayFieldHandler;
+import com.s8.lang.joos.type.primitives.StringFieldHandler;
 
 
 

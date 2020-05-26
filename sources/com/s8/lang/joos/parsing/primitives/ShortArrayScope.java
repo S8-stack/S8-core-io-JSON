@@ -1,6 +1,10 @@
-package com.s8.lang.joos.parsing;
+package com.s8.lang.joos.parsing.primitives;
 
 import com.s8.lang.joos.ParsingException;
+import com.s8.lang.joos.parsing.JOOS_ParsingException;
+import com.s8.lang.joos.parsing.ParsingScope;
+import com.s8.lang.joos.parsing.PrimitiveScope;
+import com.s8.lang.joos.parsing.PrimitivesArrayScope;
 
 public class ShortArrayScope extends PrimitivesArrayScope<Short> {
 
