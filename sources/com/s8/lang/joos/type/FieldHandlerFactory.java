@@ -3,6 +3,7 @@ package com.s8.lang.joos.type;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import com.s8.lang.joos.JOOS_Field;
 import com.s8.lang.joos.JOOS_PrimitiveExtension;
@@ -21,6 +22,8 @@ import com.s8.lang.joos.type.primitives.ShortArrayFieldHandler;
 import com.s8.lang.joos.type.primitives.ShortFieldHandler;
 import com.s8.lang.joos.type.primitives.StringArrayFieldHandler;
 import com.s8.lang.joos.type.primitives.StringFieldHandler;
+import com.s8.lang.joos.type.structures.ObjectsListFieldHandler;
+import com.s8.lang.joos.type.structures.ObjectsMapFieldHandler;
 
 
 
@@ -136,6 +139,9 @@ public class FieldHandlerFactory {
 		}
 		else if(List.class.isAssignableFrom(fieldType)) {
 			return new ObjectsListFieldHandler(name, field);
+		}
+		else if(Map.class.isAssignableFrom(fieldType)) {
+			return new ObjectsMapFieldHandler(name, field);
 		}
 		// default to object
 		else{

@@ -1,9 +1,10 @@
-package com.s8.lang.joos.type;
+package com.s8.lang.joos.type.structures;
 
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import com.s8.lang.joos.JOOS_Context;
@@ -13,6 +14,9 @@ import com.s8.lang.joos.composing.JOOS_ComposingException;
 import com.s8.lang.joos.parsing.JOOS_ParsingException;
 import com.s8.lang.joos.parsing.ObjectsArrayScope;
 import com.s8.lang.joos.parsing.ObjectsArrayScope.OnParsed;
+import com.s8.lang.joos.type.FieldHandler;
+import com.s8.lang.joos.type.JOOS_CompilingException;
+import com.s8.lang.joos.type.TypeHandler;
 import com.s8.lang.joos.parsing.ParsingScope;
 
 
@@ -29,8 +33,16 @@ public class ObjectsListFieldHandler extends FieldHandler {
 	public ObjectsListFieldHandler(String name, Field field) {
 		super(name, field);
 
-		componentType =
-				(Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+		Type actualComponentType = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+		
+		// if type is like: MySubObject<T>
+		if(actualComponentType instanceof ParameterizedType) {
+			componentType = (Class<?>) ((ParameterizedType) actualComponentType).getRawType();
+		}
+		// if type is simply like: MySubObject
+		else {
+			componentType = (Class<?>) actualComponentType;
+		}
 	}
 
 	public void set(Object object, Object value) throws JOOS_ParsingException {
