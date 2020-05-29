@@ -102,10 +102,10 @@ public class ComposingScope {
 				// indent
 				writer.write(indent);		
 			}
-
-			// value
-			writer.write(closingChar);
 		}
+		
+		// value
+		writer.write(closingChar);
 	}
 
 

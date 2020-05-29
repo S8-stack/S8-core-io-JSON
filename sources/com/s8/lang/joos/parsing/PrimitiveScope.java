@@ -23,7 +23,7 @@ public class PrimitiveScope extends ParsingScope {
 					reader.readNext();
 					boolean isAggregating = true;
 					while(isAggregating) {
-						String section = reader.until(new char[]{'"', '\\'}, null, new char[]{'}', '{', '-', '[', ']'});
+						String section = reader.until(new char[]{'"', '\\'}, null, new char[]{});
 						if(value==null) {
 							value = section;
 						}

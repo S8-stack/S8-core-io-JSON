@@ -40,7 +40,7 @@ public class ObjectsListFieldHandler extends FieldHandler {
 			componentType = (Class<?>) ((ParameterizedType) actualComponentType).getRawType();
 		}
 		// if type is simply like: MySubObject
-		else {
+		else if(actualComponentType instanceof Class<?>){
 			componentType = (Class<?>) actualComponentType;
 		}
 	}
@@ -71,7 +71,7 @@ public class ObjectsListFieldHandler extends FieldHandler {
 		/*
 		 * discover component type if annotated (compatibility with generic)
 		 */
-		if(componentType.getAnnotation(JOOS_Type.class)!=null) {
+		if(componentType!=null && componentType.getAnnotation(JOOS_Type.class)!=null) {
 			context.discover(componentType);	
 		}
 	}

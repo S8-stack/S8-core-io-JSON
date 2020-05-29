@@ -47,7 +47,7 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 			valueType = (Class<?>) ((ParameterizedType) actualValueType).getRawType();
 		}
 		// if type is simply like: MySubObject
-		else {
+		else if(actualValueType instanceof Class<?>){
 			valueType = (Class<?>) actualValueType;
 		}
 	}
@@ -69,7 +69,7 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 
 	@Override
 	public void subDiscover(JOOS_Context context) throws JOOS_CompilingException {
-		if(valueType.getAnnotation(JOOS_Type.class)!=null) {
+		if(valueType!=null && valueType.getAnnotation(JOOS_Type.class)!=null) {
 			context.discover(valueType);	
 		}
 	}
