@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.s8.blocks.joos.JOOS_Field;
 import com.s8.blocks.joos.JOOS_PrimitiveExtension;
-import com.s8.blocks.joos.annotations.JOOS_Field;
 import com.s8.blocks.joos.fields.arrays.BooleanArrayFieldHandler;
 import com.s8.blocks.joos.fields.arrays.DoubleArrayFieldHandler;
 import com.s8.blocks.joos.fields.arrays.FloatArrayFieldHandler;

@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.s8.blocks.joos.annotations.JOOS_Type;
 import com.s8.blocks.joos.composing.Composer;
 import com.s8.blocks.joos.composing.JOOS_ComposingException;
 import com.s8.blocks.joos.composing.JOOS_Writer;

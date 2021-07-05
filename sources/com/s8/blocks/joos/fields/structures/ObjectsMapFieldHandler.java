@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.s8.blocks.joos.JOOS_Lexicon;
-import com.s8.blocks.joos.annotations.JOOS_Type;
+import com.s8.blocks.joos.JOOS_Type;
 import com.s8.blocks.joos.composing.ComposingScope;
 import com.s8.blocks.joos.composing.JOOS_ComposingException;
 import com.s8.blocks.joos.fields.FieldHandler;

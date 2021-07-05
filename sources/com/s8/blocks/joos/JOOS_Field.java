@@ -1,4 +1,4 @@
-package com.s8.blocks.joos.annotations;
+package com.s8.blocks.joos;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
