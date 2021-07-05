@@ -7,6 +7,8 @@ import com.s8.blocks.joos.composing.ComposingScope;
 import com.s8.blocks.joos.composing.JOOS_ComposingException;
 import com.s8.blocks.joos.fields.PrimitiveFieldHandler;
 import com.s8.blocks.joos.parsing.JOOS_ParsingException;
+import com.s8.blocks.joos.parsing.ParsingScope;
+import com.s8.blocks.joos.parsing.PrimitiveScope;
 
 public class ShortFieldHandler extends PrimitiveFieldHandler {
 	
@@ -16,13 +18,18 @@ public class ShortFieldHandler extends PrimitiveFieldHandler {
 	}
 
 
+	
 	@Override
-	public void parse(Object object, String value) throws JOOS_ParsingException{
-		try {
-			field.setShort(object, Short.valueOf(value));
-		} catch (IllegalAccessException | IllegalArgumentException e) {
-			throw new JOOS_ParsingException("Cannot set interger due to "+e.getMessage());
-		}
+	public ParsingScope openScope(Object object) {
+		return new PrimitiveScope() {
+			public @Override void setValue(String value) throws JOOS_ParsingException {
+				try {
+					field.setShort(object, Short.valueOf(value));
+				} catch (IllegalAccessException | IllegalArgumentException e) {
+					throw new JOOS_ParsingException("Cannot set interger due to "+e.getMessage());
+				}
+			}
+		};
 	}
 	
 	@Override

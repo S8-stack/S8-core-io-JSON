@@ -7,6 +7,8 @@ import com.s8.blocks.joos.composing.ComposingScope;
 import com.s8.blocks.joos.composing.JOOS_ComposingException;
 import com.s8.blocks.joos.fields.PrimitiveFieldHandler;
 import com.s8.blocks.joos.parsing.JOOS_ParsingException;
+import com.s8.blocks.joos.parsing.ParsingScope;
+import com.s8.blocks.joos.parsing.PrimitiveScope;
 
 public abstract class JOOS_PrimitiveExtension<T> {
 
@@ -33,15 +35,22 @@ public abstract class JOOS_PrimitiveExtension<T> {
 		}
 
 		@Override
-		public void parse(Object object, String value) throws JOOS_ParsingException {
-			try {
-				field.set(object, deserialize(value));
-			} 
-			catch (IllegalArgumentException | IllegalAccessException e) {
-				e.printStackTrace();
-				throw new JOOS_ParsingException(e.getMessage());
-			}
+		public ParsingScope openScope(Object object) {
+			return new PrimitiveScope() {
+				
+				@Override
+				public void setValue(String value) throws JOOS_ParsingException {
+					try {
+						field.set(object, deserialize(value));
+					} 
+					catch (IllegalArgumentException | IllegalAccessException e) {
+						e.printStackTrace();
+						throw new JOOS_ParsingException(e.getMessage());
+					}
+				}
+			};
 		}
+		
 
 		@SuppressWarnings("unchecked")
 		@Override

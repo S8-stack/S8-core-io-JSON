@@ -6,7 +6,6 @@ module com.s8.blocks.joos {
 	exports com.s8.blocks.joos.composing;
 	
 	exports com.s8.blocks.joos.parsing;
-	exports com.s8.blocks.joos.parsing.primitives;
 	
 	exports com.s8.blocks.joos.types;
 

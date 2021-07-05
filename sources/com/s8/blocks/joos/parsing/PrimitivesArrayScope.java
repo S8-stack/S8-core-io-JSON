@@ -7,18 +7,21 @@ public abstract class PrimitivesArrayScope<T> extends ListedScope {
 
 
 	protected List<T> values;
+	
+	
+	protected Object object;
 
 
-	protected OnParsedObject callback;
+	//protected OnParsedObject callback;
 
 	protected Class<?> componentType;
 
 
 
-	public PrimitivesArrayScope(OnParsedObject callback, Class<?> componentType) {
+	public PrimitivesArrayScope(Class<?> componentType, Object object) {
 		super();
-		this.callback = callback;
 		this.componentType = componentType;
+		this.object = object;
 		this.values = new ArrayList<T>();
 	}
 
@@ -39,4 +42,7 @@ public abstract class PrimitivesArrayScope<T> extends ListedScope {
 	public void define(String definition) {
 		// no definition allowed
 	}
+	
+	public abstract void setValue(Object array) throws JOOS_ParsingException;
+	
 }

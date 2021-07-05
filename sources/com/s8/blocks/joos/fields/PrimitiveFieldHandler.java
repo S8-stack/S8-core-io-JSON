@@ -4,13 +4,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 
 import com.s8.blocks.joos.JOOS_Lexicon;
-import com.s8.blocks.joos.ParsingException;
 import com.s8.blocks.joos.composing.ComposingScope;
 import com.s8.blocks.joos.composing.JOOS_ComposingException;
-import com.s8.blocks.joos.parsing.JOOS_ParsingException;
-import com.s8.blocks.joos.parsing.ParsingScope;
-import com.s8.blocks.joos.parsing.PrimitiveScope;
-import com.s8.blocks.joos.parsing.ParsingScope.OnParsedValue;
 
 /**
  * 
@@ -38,18 +33,10 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	 * @throws ParsingException 
 	 * @throws Exception
 	 */
-	public abstract void parse(Object object, String value) throws JOOS_ParsingException;
+	//public abstract void parse(Object object, String value) throws JOOS_ParsingException;
 	
 	
-	@Override
-	public ParsingScope openScope(Object object) {
-		return new PrimitiveScope(new OnParsedValue() {
-			public @Override void set(String value) throws JOOS_ParsingException {
-				parse(object, value);
-			}
-		});
-	}
-	
+
 	
 	
 	/**
