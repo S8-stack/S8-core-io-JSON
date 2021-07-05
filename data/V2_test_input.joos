@@ -1,0 +1,169 @@
+root:(NewType){
+	a: 186,
+	sub:(NewType2){
+		a: 0,
+		aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+		d: 12.0
+	},
+	d: 12.0,
+	array:[
+		(NewType2){
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType3){
+			str: "Hello!!!",
+			settings:(MyOtherObject2){
+				str3: "kdjooijso",
+				str4: "kdjooijso",
+				str1: "kdjooijso",
+				coeficients2: [ 879.0, 87.0, 78.0, 12.0],
+				str2: "kdjooijso",
+				coeficients: [ 879.0, 87.0, 78.0, 98.0, -0.923]
+			},
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType2){
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType3){
+			str: "Hello!!!",
+			settings:(MyOtherObject2){
+				str3: "kdjooijso",
+				str4: "kdjooijso",
+				str1: "kdjooijso",
+				coeficients2: [ 879.0, 87.0, 78.0, 12.0],
+				str2: "kdjooijso",
+				coeficients: [ 879.0, 87.0, 78.0, 98.0, -0.923]
+			},
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType2){
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType3){
+			str: "Hello!!!",
+			settings:(MyOtherObject2){
+				str3: "kdjooijso",
+				str4: "kdjooijso",
+				str1: "kdjooijso",
+				coeficients2: [ 879.0, 87.0, 78.0, 12.0],
+				str2: "kdjooijso",
+				coeficients: [ 879.0, 87.0, 78.0, 98.0, -0.923]
+			},
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType2){
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType3){
+			str: "Hello!!!",
+			settings:(MyOtherObject2){
+				str3: "kdjooijso",
+				str4: "kdjooijso",
+				str1: "kdjooijso",
+				coeficients2: [ 879.0, 87.0, 78.0, 12.0],
+				str2: "kdjooijso",
+				coeficients: [ 879.0, 87.0, 78.0, 98.0, -0.923]
+			},
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		}
+	],
+	others:[
+		(NewType2){
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType3){
+			str: "Hello!!!",
+			settings:(MyOtherObject2){
+				str3: "kdjooijso",
+				str4: "kdjooijso",
+				str1: "kdjooijso",
+				coeficients2: [ 879.0, 87.0, 78.0, 12.0],
+				str2: "kdjooijso",
+				coeficients: [ 879.0, 87.0, 78.0, 98.0, -0.923]
+			},
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType2){
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType3){
+			str: "Hello!!!",
+			settings:(MyOtherObject2){
+				str3: "kdjooijso",
+				str4: "kdjooijso",
+				str1: "kdjooijso",
+				coeficients2: [ 879.0, 87.0, 78.0, 12.0],
+				str2: "kdjooijso",
+				coeficients: [ 879.0, 87.0, 78.0, 98.0, -0.923]
+			},
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType2){
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType3){
+			str: "Hello!!!",
+			settings:(MyOtherObject2){
+				str3: "kdjooijso",
+				str4: "kdjooijso",
+				str1: "kdjooijso",
+				coeficients2: [ 879.0, 87.0, 78.0, 12.0],
+				str2: "kdjooijso",
+				coeficients: [ 879.0, 87.0, 78.0, 98.0, -0.923]
+			},
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType2){
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		},
+		(NewType3){
+			str: "Hello!!!",
+			settings:(MyOtherObject2){
+				str3: "kdjooijso",
+				str4: "kdjooijso",
+				str1: "kdjooijso",
+				coeficients2: [ 879.0, 87.0, 78.0, 12.0],
+				str2: "kdjooijso",
+				coeficients: [ 879.0, 87.0, 78.0, 98.0, -0.923]
+			},
+			a: 0,
+			aliases: [ "ouqjoijoij", "lkjlkjlj817çuk", "kpkspok++"],
+			d: 12.0
+		}
+	]
+}+"],
+			d: 12.0
+		}
+	]
+}
