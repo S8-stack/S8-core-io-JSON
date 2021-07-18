@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 
-import com.s8.alpha.models.S8Ref;
+import com.s8.alpha.models.S8ObjectRef;
 import com.s8.blocks.joos.JOOS_Lexicon;
 import com.s8.blocks.joos.JOOS_PrimitiveExtension;
 import com.s8.blocks.joos.parsing.JOOS_ParsingException;
@@ -32,19 +32,13 @@ public class LaunchParsingTest {
 
 		JOOS_Lexicon context = new JOOS_Lexicon();
 		
-		context.definePrimitiveExtension(new JOOS_PrimitiveExtension<S8Ref<?>>(S8Ref.class) {
-			public @Override String serialize(S8Ref<?> value) {
+		context.definePrimitiveExtension(new JOOS_PrimitiveExtension<S8ObjectRef<?>>(S8ObjectRef.class) {
+			public @Override String serialize(S8ObjectRef<?> value) {
 				return value.toHexString();
 			}
 
-			public @Override S8Ref<?> deserialize(String str) {
-				try {
-					return S8Ref.fromHexString(str);
-				} 
-				catch (IOException e) {
-					e.printStackTrace();
-					return null;
-				}
+			public @Override S8ObjectRef<?> deserialize(String str) {
+				return null;
 			}
 		});
 		
