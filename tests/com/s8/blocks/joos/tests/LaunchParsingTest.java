@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 
-import com.s8.alpha.models.S8Repo;
+import com.s8.alpha.models.shells.S8Repo;
 import com.s8.blocks.joos.JOOS_Lexicon;
 import com.s8.blocks.joos.JOOS_PrimitiveExtension;
 import com.s8.blocks.joos.parsing.JOOS_ParsingException;
