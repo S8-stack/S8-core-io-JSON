@@ -3,7 +3,7 @@ package com.s8.blocks.joos.tests.repo00;
 import java.util.List;
 import java.util.Map;
 
-import com.s8.alpha.models.shells.S8Repo;
+import com.s8.alpha.models.graphs.S8Repo;
 import com.s8.blocks.joos.JOOS_Field;
 import com.s8.blocks.joos.JOOS_Type;
 

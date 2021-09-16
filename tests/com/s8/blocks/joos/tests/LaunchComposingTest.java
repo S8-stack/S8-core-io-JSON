@@ -6,7 +6,7 @@ import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import com.s8.alpha.models.shells.S8Repo;
+import com.s8.alpha.models.graphs.S8Repo;
 import com.s8.blocks.joos.JOOS_Lexicon;
 import com.s8.blocks.joos.JOOS_PrimitiveExtension;
 import com.s8.blocks.joos.composing.JOOS_ComposingException;
