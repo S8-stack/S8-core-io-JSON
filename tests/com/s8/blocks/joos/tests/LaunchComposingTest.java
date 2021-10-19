@@ -6,9 +6,7 @@ import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
-import com.s8.alpha.models.graphs.S8Repo;
 import com.s8.blocks.joos.JOOS_Lexicon;
-import com.s8.blocks.joos.JOOS_PrimitiveExtension;
 import com.s8.blocks.joos.composing.JOOS_ComposingException;
 import com.s8.blocks.joos.tests.repo00.MyRootType;
 import com.s8.blocks.joos.tests.repo00.NewType2;
@@ -48,18 +46,7 @@ public class LaunchComposingTest {
 
 		JOOS_Lexicon context = new JOOS_Lexicon();
 		context.discover(MyRootType.class);
-		context.definePrimitiveExtension(new JOOS_PrimitiveExtension<S8Repo<?>>(S8Repo.class) {
-			@Override 
-			public String serialize(S8Repo<?> value) {
-				return value.toHexString();
-			}
-			@Override 
-			public S8Repo<?> deserialize(String str) {
-				//return S8ObjectRef.fromHexString(str);
-				return null;
-			}
-		});
-
+		
 
 
 		String pathname = "data/V2_test_output.joos";
