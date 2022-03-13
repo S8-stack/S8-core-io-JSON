@@ -5,11 +5,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 
-import com.s8.blocks.joos.JOOS_Lexicon;
-import com.s8.blocks.joos.parsing.JOOS_ParsingException;
 import com.s8.blocks.joos.tests.repo00.MyRootType;
-import com.s8.blocks.joos.types.JOOS_CompilingException;
-import com.s8.blocks.joos.utilities.JOOS_BufferedFileReader;
+import com.s8.io.joos.JOOS_Lexicon;
+import com.s8.io.joos.parsing.JOOS_ParsingException;
+import com.s8.io.joos.types.JOOS_CompilingException;
+import com.s8.io.joos.utilities.JOOS_BufferedFileReader;
 
 public class LaunchReParsingTest {
 

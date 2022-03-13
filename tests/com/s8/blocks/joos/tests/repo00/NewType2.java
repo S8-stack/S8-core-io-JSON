@@ -1,7 +1,7 @@
 package com.s8.blocks.joos.tests.repo00;
 
-import com.s8.blocks.joos.JOOS_Field;
-import com.s8.blocks.joos.JOOS_Type;
+import com.s8.io.joos.JOOS_Field;
+import com.s8.io.joos.JOOS_Type;
 
 @JOOS_Type(name="NewType2", sub= {NewType3.class})
 public class NewType2 {
