@@ -7,7 +7,7 @@
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  * 
  */
-module com.s8.blocks.joos {
+module com.s8.io.joos {
 	
 	
 	exports com.s8.io.joos;
@@ -24,10 +24,6 @@ module com.s8.blocks.joos {
 	exports com.s8.io.joos.fields.objects;
 	
 	exports com.s8.io.joos.utilities;
-	
-
-	exports com.s8.blocks.joos.tests;
-	exports com.s8.blocks.joos.tests.repo00;
 	
 
 }
