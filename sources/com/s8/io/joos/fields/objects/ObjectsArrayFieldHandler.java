@@ -4,6 +4,7 @@ package com.s8.io.joos.fields.objects;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.s8.io.joos.JOOS_Lexicon;
@@ -12,7 +13,8 @@ import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.FieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
-import com.s8.io.joos.parsing.ObjectsArrayScope;
+import com.s8.io.joos.parsing.ListScope;
+import com.s8.io.joos.parsing.ObjectScope;
 import com.s8.io.joos.parsing.ParsingScope;
 import com.s8.io.joos.types.JOOS_CompilingException;
 import com.s8.io.joos.types.TypeHandler;
@@ -27,9 +29,48 @@ import com.s8.io.joos.types.TypeHandler;
  *
  */
 public class ObjectsArrayFieldHandler extends FieldHandler {
+	
+	public static class Builder extends FieldHandler.Builder {
+		
+		public ObjectsArrayFieldHandler handler;
+		
+		public Builder(String name, Field field) {
+			super();
+			this.handler = new ObjectsArrayFieldHandler(name, field);
+		}
+		
+		@Override
+		public Class<?> getSubType() {
+			return handler.componentType;
+		}
 
 
-	private Class<?> componentType;
+		@Override
+		public void subDiscover(JOOS_Lexicon.Builder context) throws JOOS_CompilingException {
+			
+			/*
+			 * discover component type if annotated (compatibility with generic)
+			 */
+			if(handler.componentType.getAnnotation(JOOS_Type.class)!=null) {
+				context.discover(handler.componentType);	
+			}
+		}
+		
+		@Override
+		public void compile(JOOS_Lexicon.Builder lexiconBuilder) {
+			handler.componentTypeHandler = lexiconBuilder.getByClassName(handler.componentType);
+		}
+		
+		@Override
+		public FieldHandler getHandler() {
+			return handler;
+		}
+	}
+
+
+	public Class<?> componentType;
+	
+	public TypeHandler componentTypeHandler;
 
 
 	public ObjectsArrayFieldHandler(String name, Field field) {
@@ -51,22 +92,7 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 	}
 
 
-	@Override
-	public Class<?> getSubType() {
-		return componentType;
-	}
-
-
-	@Override
-	public void subDiscover(JOOS_Lexicon context) throws JOOS_CompilingException {
-		
-		/*
-		 * discover component type if annotated (compatibility with generic)
-		 */
-		if(componentType.getAnnotation(JOOS_Type.class)!=null) {
-			context.discover(componentType);	
-		}
-	}
+	
 
 	@Override
 	public boolean compose(Object object, ComposingScope scope) throws IOException, JOOS_ComposingException {
@@ -111,11 +137,26 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 		}
 	}
 
+	
 	@Override
 	public ParsingScope openScope(Object object) {
-		return new ObjectsArrayScope(getSubType(), new ObjectsArrayScope.OnParsed() {
+		
+		return new ListScope() {
+			
+			private List<Object> values = new ArrayList<>();
+			
 			@Override
-			public void set(List<Object> values) throws JOOS_ParsingException {
+			public ParsingScope openItemScope() throws JOOS_ParsingException {
+				return new ObjectScope(componentTypeHandler) {
+					@Override
+					public void onParsed(Object object) throws JOOS_ParsingException {
+						values.add(object);
+					}
+				};
+			}
+			
+			@Override
+			public void close() throws JOOS_ParsingException {
 				int length = values.size();
 				Object array = Array.newInstance(componentType, length);
 				for(int index=0; index<length; index++) {
@@ -123,6 +164,6 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 				}
 				ObjectsArrayFieldHandler.this.set(object, array);
 			}
-		});
+		};
 	}
 }

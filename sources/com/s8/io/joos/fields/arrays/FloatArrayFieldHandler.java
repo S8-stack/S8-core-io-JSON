@@ -23,6 +23,15 @@ import com.s8.io.joos.parsing.PrimitivesArrayScope;
  */
 public class FloatArrayFieldHandler extends PrimitivesArrayFieldHandler {
 
+	public static class Builder extends PrimitivesArrayFieldHandler.Builder {
+
+		public Builder(String name, Field field) {
+			super(field);
+			handler = new FloatArrayFieldHandler(name, field);
+		}
+	}
+	
+	
 	public FloatArrayFieldHandler(String name, Field field) {
 		super(name, field);
 	}
@@ -51,7 +60,7 @@ public class FloatArrayFieldHandler extends PrimitivesArrayFieldHandler {
 		}
 
 		@Override
-		public ParsingScope openItem() throws JOOS_ParsingException {
+		public ParsingScope openItemScope() throws JOOS_ParsingException {
 			return new PrimitiveScope() {
 
 				@Override

@@ -22,6 +22,16 @@ import com.s8.io.joos.parsing.PrimitivesArrayScope;
  */
 public class BooleanArrayFieldHandler extends PrimitivesArrayFieldHandler {
 
+
+	public static class Builder extends PrimitivesArrayFieldHandler.Builder {
+
+		public Builder(String name, Field field) {
+			super(field);
+			handler = new BooleanArrayFieldHandler(name, field);
+		}
+	}
+
+
 	public BooleanArrayFieldHandler(String name, Field field) {
 		super(name, field);
 	}
@@ -51,7 +61,7 @@ public class BooleanArrayFieldHandler extends PrimitivesArrayFieldHandler {
 		}
 
 		@Override
-		public ParsingScope openItem() throws JOOS_ParsingException {
+		public ParsingScope openItemScope() throws JOOS_ParsingException {
 			return new PrimitiveScope() {
 				@Override
 				public void setValue(String value) throws JOOS_ParsingException, ParsingException {
@@ -69,7 +79,7 @@ public class BooleanArrayFieldHandler extends PrimitivesArrayFieldHandler {
 			}
 			setValue(array);
 		}
-		
+
 		@Override
 		public void setValue(Object value) throws JOOS_ParsingException {
 			try {

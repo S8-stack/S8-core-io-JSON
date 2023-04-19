@@ -21,8 +21,15 @@ import com.s8.io.joos.parsing.PrimitiveScope;
  */
 public class ShortFieldHandler extends PrimitiveFieldHandler {
 	
+	public static class Builder extends PrimitiveFieldHandler.Builder {
+
+		public Builder(String name, Field field) {
+			super();
+			handler = new ShortFieldHandler(name, field);
+		}
+	}
 	
-	public ShortFieldHandler(String name, Field field) {
+	private ShortFieldHandler(String name, Field field) {
 		super(name, field);
 	}
 

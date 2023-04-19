@@ -19,9 +19,17 @@ import com.s8.io.joos.parsing.PrimitiveScope;
  * 
  */
 public class BooleanFieldHandler extends PrimitiveFieldHandler {
+	
+	public static class Builder extends PrimitiveFieldHandler.Builder {
+		
+		public Builder(String name, Field field) {
+			super();
+			handler = new BooleanFieldHandler(name, field);
+		}
+	}
 
 
-	public BooleanFieldHandler(String name, Field field) {
+	private BooleanFieldHandler(String name, Field field) {
 		super(name, field);
 	}
 

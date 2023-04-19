@@ -18,12 +18,45 @@ import com.s8.io.joos.composing.JOOS_ComposingException;
  *
  */
 public abstract class PrimitivesArrayFieldHandler extends FieldHandler {
+	
+	public static class Builder extends FieldHandler.Builder {
+		
+		public PrimitivesArrayFieldHandler handler;
+		
+		private Class<?> componentType;
 
-	private Class<?> componentType;
+		public Builder(Field field) {
+			super();
+			componentType = field.getType().getComponentType();
+		}
+
+		@Override
+		public Class<?> getSubType() {
+			return componentType;
+		}
+
+		@Override
+		public void subDiscover(JOOS_Lexicon.Builder context) {
+			// nothing to sub-discover
+		}
+
+		@Override
+		public void compile(JOOS_Lexicon.Builder lexiconBuilder) {
+		}
+		
+		@Override
+		public FieldHandler getHandler() {
+			return handler;
+		}
+	}
+	
+	
+
+	
 
 	public PrimitivesArrayFieldHandler(String name, Field field) {
 		super(name, field);
-		componentType = field.getType().getComponentType();
+		
 	}
 
 	/**
@@ -37,16 +70,6 @@ public abstract class PrimitivesArrayFieldHandler extends FieldHandler {
 		field.set(object, values);
 	}
 
-
-	@Override
-	public Class<?> getSubType() {
-		return componentType;
-	}
-
-	@Override
-	public void subDiscover(JOOS_Lexicon context) {
-		// nothing to sub-discover
-	}
 
 	/**
 	 * 

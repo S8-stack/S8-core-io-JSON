@@ -11,7 +11,7 @@ import java.util.List;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  * 
  */
-public class ObjectsArrayScope extends ListedScope {
+public class ObjectsArrayScope extends ListScope {
 
 
 	private OnParsed callback;
@@ -39,7 +39,7 @@ public class ObjectsArrayScope extends ListedScope {
 	}
 
 	@Override
-	public ParsingScope openItem() throws JOOS_ParsingException {
+	public ParsingScope openItemScope() throws JOOS_ParsingException {
 		return new ObjectScope(new ObjectScope.OnParsedObject() {
 			public @Override void set(Object value) {
 				values.add(value);

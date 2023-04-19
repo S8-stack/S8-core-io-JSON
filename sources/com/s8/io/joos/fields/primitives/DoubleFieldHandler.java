@@ -19,16 +19,24 @@ import com.s8.io.joos.parsing.PrimitiveScope;
  * 
  */
 public class DoubleFieldHandler extends PrimitiveFieldHandler {
-	
+
+	public static class Builder extends PrimitiveFieldHandler.Builder {
+
+		public Builder(String name, Field field) {
+			super();
+			handler = new DoubleFieldHandler(name, field);
+		}
+	}
+
 	public DoubleFieldHandler(String name, Field field) {
 		super(name, field);
 	}
 
-	
+
 	@Override
 	public ParsingScope openScope(Object object) {
 		return new PrimitiveScope() {
-			
+
 			@Override
 			public void setValue(String value) throws JOOS_ParsingException {
 				try {
@@ -39,15 +47,15 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 			}
 		};
 	}
-	
+
 	@Override
 	public boolean compose(Object object, ComposingScope scope) 
 			throws IOException, JOOS_ComposingException  {
-		
+
 		scope.newItem();
 		scope.append(name);
 		scope.append(": ");
-		
+
 		try {
 			scope.append(Double.toString(field.getDouble(object)));
 		} 
@@ -55,16 +63,16 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}
-		
+
 		return true;
 	}
-	
+
 
 	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return Double.toString(field.getDouble(object));
 	}
-	*/
+	 */
 
 }

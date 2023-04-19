@@ -15,17 +15,7 @@ import com.s8.io.joos.ParsingException;
  */
 public abstract class ParsingScope {
 	
-	public enum ScopeType {
-		/** when in map-type scope, expected declarator before all definition */
-		MAPPED, 
-		
-		/** direct list (no declarator) */
-		LISTED,
-		
-		/** */
-		PRIMITIVE;
-	}
-
+	
 	public abstract static class OnParsedObject {
 
 		public abstract void set(Object value) throws JOOS_ParsingException;
@@ -63,9 +53,6 @@ public abstract class ParsingScope {
 
 	public abstract ScopeType getType();
 
-	public abstract boolean isClosedBy(char c);
-	
-		
 	
 
 }

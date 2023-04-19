@@ -21,6 +21,13 @@ import com.s8.io.joos.parsing.PrimitiveScope;
  */
 public class IntegerFieldHandler extends PrimitiveFieldHandler {
 
+	public static class Builder extends PrimitiveFieldHandler.Builder {
+
+		public Builder(String name, Field field) {
+			super();
+			handler = new IntegerFieldHandler(name, field);
+		}
+	}
 
 	public IntegerFieldHandler(String name, Field field) {
 		super(name, field);

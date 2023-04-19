@@ -4,6 +4,7 @@ package com.s8.io.joos;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
 
 import com.s8.io.joos.composing.Composer;
 import com.s8.io.joos.composing.JOOS_ComposingException;
@@ -24,59 +25,123 @@ import com.s8.io.joos.types.TypeHandler;
  *
  */
 public class JOOS_Lexicon {
+	
+	
+	public static JOOS_Lexicon from(Class<?>... types) throws JOOS_CompilingException {
+		JOOS_Lexicon lexicon = new JOOS_Lexicon();
+		Builder builder = lexicon.new Builder();
+		for(Class<?> type : types) { builder.discover(type); }
+		return lexicon;
+	}
+
+
+	/**
+	 * 
+	 * @author pierreconvert
+	 *
+	 */
+	public class Builder {
+
+
+		private final FieldHandlerFactory fieldHandlerFactory;
+
+		public Queue<Class<?>> buffer;
+
+		private Map<String, TypeHandler.Builder> builders = new HashMap<String, TypeHandler.Builder>();
+
+
+		public Builder() {
+			fieldHandlerFactory = new FieldHandlerFactory();
+		}
+		
+		
+		/**
+		 * 
+		 * @param type
+		 * @throws JOOS_CompilingException
+		 */
+		public void discover(Class<?> type) throws JOOS_CompilingException{
+			if(type==null){
+				throw new RuntimeException("[Ws3dContext] Type is null");
+			}
+
+			JOOS_Type annotation = type.getAnnotation(JOOS_Type.class);
+			if(annotation==null){
+				throw new RuntimeException("[Ws3dContext] Type is not annotated: "+type);
+			}
+			
+			// 
+			buffer.add(type);
+		}
+
+
+
+		public void build() throws JOOS_CompilingException{
+			
+			while(!buffer.isEmpty()) {
+				
+				Class<?> type = buffer.poll();
+				if(!builders.containsKey(type.getName())) {
+					
+					TypeHandler handler = new TypeHandler(type);
+					TypeHandler.Builder typeBuilder = handler.new Builder();
+					
+					// store
+					builders.put(type.getName(), typeBuilder);
+					
+					
+					typeBuilder.build(fieldHandlerFactory);
+					
+					typeBuilder.discover(this);
+				}
+			}
+
+			
+			
+			builders.forEach((nkey, builder) -> {
+				builder.compile(this);
+			});
+		}
+
+
+
+
+		/**
+		 * 
+		 * @param extension
+		 */
+		public <T> void definePrimitiveExtension(JOOS_PrimitiveExtension<T> extension) {
+			fieldHandlerFactory.add(extension);
+		}
+
+
+		public FieldHandlerFactory getFieldFactory() {
+			return fieldHandlerFactory;
+		}
+
+
+		/**
+		 * 
+		 * @param type
+		 * @return
+		 */
+		public TypeHandler getByClassName(Class<?> type){
+			return builders.get(type.getName()).getHandler();
+		}
+	}
 
 	/**
 	 * root Types: the only allowed types to start a joos file in the context of this engine instance
 	 */
 	private Map<String, TypeHandler> types = new HashMap<String, TypeHandler>();
 
-	private Map<String, TypeHandler> typesByClassName = new HashMap<String, TypeHandler>();
 
-	private final FieldHandlerFactory fieldHandlerFactory;
 
-	public JOOS_Lexicon(){
+	private JOOS_Lexicon(){
 		super();
-		fieldHandlerFactory = new FieldHandlerFactory();
 	}
 
 
-	public TypeHandler discover(Class<?> type) throws JOOS_CompilingException{
-		if(type==null){
-			throw new RuntimeException("[Ws3dContext] Type is null");
-		}
-		
-		JOOS_Type annotation = type.getAnnotation(JOOS_Type.class);
-		if(annotation==null){
-			throw new RuntimeException("[Ws3dContext] Type is not annotated: "+type);
-		}
-		
-		String name = annotation.name();
-		TypeHandler typeHandler = types.get(name);
-		if(typeHandler == null){
-			typeHandler = new TypeHandler(type);
-			
-			// registration
-			types.put(name, typeHandler);
-			typesByClassName.put(type.getName(), typeHandler);
-			
-			typeHandler.initialize(this);
-		}
-		return typeHandler;
-	}
-	
-	
-	/**
-	 * 
-	 * @param extension
-	 */
-	public <T> void definePrimitiveExtension(JOOS_PrimitiveExtension<T> extension) {
-		fieldHandlerFactory.add(extension);
-	}
-
-
-	public FieldHandlerFactory getFieldFactory() {
-		return fieldHandlerFactory;
-	}
 
 	/**
 	 * 
@@ -90,16 +155,16 @@ public class JOOS_Lexicon {
 	 * @throws Exception 
 	 */
 	public TypeHandler get(Class<?> type) throws JOOS_ComposingException {
-		
+
 		if(type==null){
 			throw new JOOS_ComposingException("[Ws3dContext] Type is null");
 		}
-		
+
 		JOOS_Type annotation = type.getAnnotation(JOOS_Type.class);
 		if(annotation==null){
 			throw new JOOS_ComposingException("[Ws3dContext] Type is not annotated: "+type);
 		}
-		
+
 		String name = annotation.name();
 		TypeHandler typeHandler = types.get(name);
 		return typeHandler;
@@ -109,13 +174,8 @@ public class JOOS_Lexicon {
 	public TypeHandler get(String name){
 		return types.get(name);
 	}
-	
-	
-	public TypeHandler getByClassName(Class<?> type){
-		return typesByClassName.get(type.getName());
-	}
 
-	
+
 	/**
 	 * 
 	 * @param reader
@@ -128,8 +188,8 @@ public class JOOS_Lexicon {
 		Parser parser = new Parser(this, new StreamReader(reader), isVerbose);
 		return parser.parse();
 	}
-	
-	
+
+
 	/**
 	 * 
 	 * @param writer

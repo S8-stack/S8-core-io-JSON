@@ -11,7 +11,6 @@ import com.s8.io.joos.fields.FieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ObjectScope;
 import com.s8.io.joos.parsing.ParsingScope;
-import com.s8.io.joos.parsing.ParsingScope.OnParsedObject;
 import com.s8.io.joos.types.JOOS_CompilingException;
 import com.s8.io.joos.types.TypeHandler;
 
@@ -25,38 +24,66 @@ import com.s8.io.joos.types.TypeHandler;
  *
  */
 public class ObjectFieldHandler extends FieldHandler {
+	
+	
+	public static class Builder extends FieldHandler.Builder  {
+	
+		public Class<?> fieldType;
+		
+		public final ObjectFieldHandler handler;
+		
+		public Builder(String name, Field field) {
+			super();
+			handler = new ObjectFieldHandler(name, field);
+			this.fieldType = field.getType();
+		}
+		
+
+		@Override
+		public Class<?> getSubType() {
+			return fieldType;
+		}
+		
+		@Override
+		public void subDiscover(JOOS_Lexicon.Builder context) throws JOOS_CompilingException {
+			if(fieldType.getAnnotation(JOOS_Type.class)!=null) {
+				context.discover(fieldType);	
+			}
+		}
+		
+		
+		@Override
+		public void compile(JOOS_Lexicon.Builder lexiconBuilder) {
+			handler.fieldType = lexiconBuilder.getByClassName(fieldType);
+		}
+
+
+		@Override
+		public FieldHandler getHandler() {
+			return handler;
+		}
+	}
+	
+	
 
 	/**
 	 * 
 	 */
-	public Class<?> fieldType;
+	public TypeHandler fieldType;
 
-	public ObjectFieldHandler(String name, Field field) {
+	private ObjectFieldHandler(String name, Field field) {
 		super(name, field);
-		this.fieldType = field.getType();
 	}
 
 	public void set(Object object, Object child) throws IllegalArgumentException, IllegalAccessException {
 		field.set(object, child);
 	}
 
-	@Override
-	public Class<?> getSubType() {
-		return fieldType;
-	}
-
-
-
 	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
 		return field.get(object);
 	}
 
-	@Override
-	public void subDiscover(JOOS_Lexicon context) throws JOOS_CompilingException {
-		if(fieldType.getAnnotation(JOOS_Type.class)!=null) {
-			context.discover(fieldType);	
-		}
-	}
+	
 
 	@Override
 	public boolean compose(Object object, ComposingScope scope) throws JOOS_ComposingException, IOException {
@@ -87,17 +114,16 @@ public class ObjectFieldHandler extends FieldHandler {
 	}
 
 	@Override
-	public ParsingScope openScope(Object object) {
-		return new ObjectScope(new OnParsedObject() {
-			@Override
-			public void set(Object value) throws JOOS_ParsingException {
+	public ParsingScope openScope(Object parent) {
+		return new ObjectScope(fieldType) {
+			public @Override void onParsed(Object child) throws JOOS_ParsingException {
 				try {
-					ObjectFieldHandler.this.set(object, value);
+					ObjectFieldHandler.this.set(parent, child);
 				}
 				catch (IllegalArgumentException | IllegalAccessException e) {
 					throw new JOOS_ParsingException("Failed to set object due to "+e.getMessage());
 				}
-			}	
-		});
+			}
+		};
 	}
 }

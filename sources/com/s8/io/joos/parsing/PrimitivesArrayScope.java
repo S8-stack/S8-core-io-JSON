@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @param <T>
  */
-public abstract class PrimitivesArrayScope<T> extends ListedScope {
+public abstract class PrimitivesArrayScope<T> extends ListScope {
 
 
 	protected List<T> values;

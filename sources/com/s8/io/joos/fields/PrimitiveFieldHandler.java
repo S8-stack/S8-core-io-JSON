@@ -16,6 +16,30 @@ import com.s8.io.joos.composing.JOOS_ComposingException;
  */
 public abstract class PrimitiveFieldHandler extends FieldHandler {
 
+	public static class Builder extends FieldHandler.Builder {
+		
+		public PrimitiveFieldHandler handler;
+		
+
+		@Override
+		public Class<?> getSubType() {
+			return null;
+		}
+		
+		@Override
+		public void subDiscover(JOOS_Lexicon.Builder context) {
+			// nothing to sub-discover
+		}
+
+		@Override
+		public void compile(JOOS_Lexicon.Builder lexiconBuilder) {
+		}
+		
+		@Override
+		public FieldHandler getHandler() {
+			return handler;
+		}
+	}
 	
 	
 	/**
@@ -23,7 +47,7 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	 * @param name
 	 * @param field
 	 */
-	public PrimitiveFieldHandler(String name, Field field) {
+	protected PrimitiveFieldHandler(String name, Field field) {
 		super(name, field);
 	}
 
@@ -56,15 +80,4 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 
 
 	
-	@Override
-	public Class<?> getSubType() {
-		return null;
-	}
-	
-	
-	
-	@Override
-	public void subDiscover(JOOS_Lexicon context) {
-		// nothing to sub-discover
-	}
 }

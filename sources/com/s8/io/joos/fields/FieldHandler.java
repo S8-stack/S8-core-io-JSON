@@ -20,6 +20,34 @@ import com.s8.io.joos.types.JOOS_CompilingException;
 public abstract class FieldHandler {
 	
 	
+	public static abstract class Builder {
+		
+
+		/**
+		 * 
+		 * @return the type to be explored next by the TypeHandler constructor.
+		 */
+		public abstract Class<?> getSubType();
+
+
+		public abstract void subDiscover(JOOS_Lexicon.Builder context) throws JOOS_CompilingException;
+		
+		
+		/**
+		 * 
+		 * @param lexiconBuilder
+		 */
+		public abstract void compile(JOOS_Lexicon.Builder lexiconBuilder);
+
+
+		/**
+		 * 
+		 * @return
+		 */
+		public abstract FieldHandler getHandler();
+		
+	}
+	
 
 	/**
 	 * 
@@ -62,20 +90,11 @@ public abstract class FieldHandler {
 			IllegalArgumentException;
 			*/
 
-	/**
-	 * 
-	 * @return the type to be explored next by the TypeHandler constructor.
-	 */
-	public abstract Class<?> getSubType();
-
-
 	public String getName() {
 		return name;
 	}
 
 
-	public abstract void subDiscover(JOOS_Lexicon context) throws JOOS_CompilingException;
-	
 	
 	public abstract ParsingScope openScope(Object object);
 

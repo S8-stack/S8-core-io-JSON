@@ -64,38 +64,40 @@ public class FieldHandlerFactory {
 	 * @throws JOOS_ParsingException 
 	 * @throws Exception
 	 */
-	public FieldHandler create(Field field) throws JOOS_CompilingException {
+	public FieldHandler.Builder create(Field field) throws JOOS_CompilingException {
 
 		JOOS_Field annotation = field.getAnnotation(JOOS_Field.class);
 
 		String name = annotation.name();
 		Class<?> fieldType = field.getType();
 
+		/*
 		for(JOOS_PrimitiveExtension<?> extension : extensions) {
 			if(extension.isMatching(fieldType)) {
 				return extension.createFieldHandler(name, field);
 			}
 		}
+		*/
 
 		// primitive
 		if(fieldType.isPrimitive()){
 			if(fieldType == boolean.class){
-				return new BooleanFieldHandler(name, field);
+				return new BooleanFieldHandler.Builder(name, field);
 			}
 			else if(fieldType == short.class){
-				return new ShortFieldHandler(name, field);
+				return new ShortFieldHandler.Builder(name, field);
 			}
 			else if(fieldType == int.class){
-				return new IntegerFieldHandler(name, field);
+				return new IntegerFieldHandler.Builder(name, field);
 			}
 			else if(fieldType == long.class){
-				return new LongFieldHandler(name, field);
+				return new LongFieldHandler.Builder(name, field);
 			}
 			else if(fieldType == float.class){
-				return new FloatFieldHandler(name, field);
+				return new FloatFieldHandler.Builder(name, field);
 			}
 			else if(fieldType == double.class){
-				return new DoubleFieldHandler(name, field);
+				return new DoubleFieldHandler.Builder(name, field);
 			}
 			else{
 				throw new RuntimeException("Primitive type not supported "+fieldType.getName());
@@ -103,11 +105,11 @@ public class FieldHandlerFactory {
 		}
 		// primitive
 		else if(fieldType == String.class){
-			return new StringFieldHandler(name, field);
+			return new StringFieldHandler.Builder(name, field);
 		}
 		// enum
 		else if(fieldType.isEnum()){
-			return new EnumFieldHandler(name, field);
+			return new EnumFieldHandler.Builder(name, field);
 		}
 		// array
 		else if(fieldType.isArray()){
@@ -116,22 +118,22 @@ public class FieldHandlerFactory {
 			// array of primitive
 			if(componentType.isPrimitive()){
 				if(componentType==boolean.class) {
-					return new BooleanArrayFieldHandler(name, field);
+					return new BooleanArrayFieldHandler.Builder(name, field);
 				}
 				else if(componentType==short.class) {
-					return new ShortArrayFieldHandler(name, field);
+					return new ShortArrayFieldHandler.Builder(name, field);
 				}
 				else if(componentType==int.class) {
-					return new IntegerArrayFieldHandler(name, field);
+					return new IntegerArrayFieldHandler.Builder(name, field);
 				}
 				else if(componentType==long.class) {
-					return new LongArrayFieldHandler(name, field);
+					return new LongArrayFieldHandler.Builder(name, field);
 				}
 				else if(componentType==float.class) {
-					return new FloatArrayFieldHandler(name, field);
+					return new FloatArrayFieldHandler.Builder(name, field);
 				}
 				else if(componentType==double.class) {
-					return new DoubleArrayFieldHandler(name, field);
+					return new DoubleArrayFieldHandler.Builder(name, field);
 				}
 				else {
 					throw new JOOS_CompilingException(field.getDeclaringClass(), 
@@ -139,22 +141,22 @@ public class FieldHandlerFactory {
 				}
 			}
 			else if(componentType==String.class) {
-				return new StringArrayFieldHandler(name, field);
+				return new StringArrayFieldHandler.Builder(name, field);
 			}
 			// array of object
 			else{
-				return new ObjectsArrayFieldHandler(name, field);
+				return new ObjectsArrayFieldHandler.Builder(name, field);
 			}
 		}
 		else if(List.class.isAssignableFrom(fieldType)) {
-			return new ObjectsListFieldHandler(name, field);
+			return new ObjectsListFieldHandler.Builder(name, field);
 		}
 		else if(Map.class.isAssignableFrom(fieldType)) {
-			return new ObjectsMapFieldHandler(name, field);
+			return new ObjectsMapFieldHandler.Builder(name, field);
 		}
 		// default to object
 		else{
-			return new ObjectFieldHandler(name, field);	
+			return new ObjectFieldHandler.Builder(name, field);	
 		}
 	}
 }

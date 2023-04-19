@@ -21,6 +21,15 @@ import com.s8.io.joos.parsing.PrimitiveScope;
  */
 public class FloatFieldHandler extends PrimitiveFieldHandler {
 	
+	public static class Builder extends PrimitiveFieldHandler.Builder {
+
+		public Builder(String name, Field field) {
+			super();
+			handler = new FloatFieldHandler(name, field);
+		}
+	}
+	
+	
 	public FloatFieldHandler(String name, Field field) {
 		super(name, field);
 	}

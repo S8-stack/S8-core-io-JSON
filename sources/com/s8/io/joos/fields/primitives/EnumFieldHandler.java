@@ -24,10 +24,21 @@ import com.s8.io.joos.parsing.PrimitiveScope;
  */
 public class EnumFieldHandler extends PrimitiveFieldHandler {
 
+
+	public static class Builder extends PrimitiveFieldHandler.Builder {
+
+		public Builder(String name, Field field) {
+			super();
+			handler = new EnumFieldHandler(name, field);
+		}
+	}
+
+
 	private Map<String, Object> map;
 
-	public EnumFieldHandler(String name, Field field) {
+	private EnumFieldHandler(String name, Field field) {
 		super(name, field);
+
 		Class<?> enumType = field.getType();
 		map = new HashMap<>();
 		for(Object enumInstance : enumType.getEnumConstants()){
@@ -35,11 +46,11 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 		}
 	}
 
-	
+
 	@Override
 	public ParsingScope openScope(Object object) {
 		return new PrimitiveScope() {
-			
+
 			@Override
 			public void setValue(String value) throws JOOS_ParsingException {
 				try {
@@ -50,8 +61,8 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 			}
 		};
 	}
-	
-	
+
+
 
 	@Override
 	public boolean compose(Object object, ComposingScope scope) 
@@ -60,7 +71,7 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 		scope.newItem();
 		scope.append(name);
 		scope.append(": ");
-		
+
 		Object item;
 		try {
 			item = field.get(object);
