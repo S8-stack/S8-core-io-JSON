@@ -32,12 +32,13 @@ public class Composer {
 
 
 	public void compose(Object object) throws IOException, JOOS_ComposingException {
-		writer.write("root:");
+		writer.write("const ROOT = ");
 		ComposingScope scope = new RootComposingScope(context, writer, indentSequence);
 		
 		
 		TypeHandler typeHandler = context.get(object.getClass());
-		typeHandler.compose(object, scope);
+		typeHandler.compose(object, scope, false);
+		writer.write(";");
 		
 	}
 

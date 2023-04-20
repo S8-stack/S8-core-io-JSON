@@ -15,8 +15,7 @@ public class LaunchReParsingTest {
 
 	public static void main(String[] args) throws IOException, JOOS_CompilingException {
 		
-		JOOS_Lexicon context = new JOOS_Lexicon();
-		context.discover(MyRootType.class);
+		JOOS_Lexicon context = JOOS_Lexicon.from(MyRootType.class);
 		
 		
 		String pathname = "data/V2_test_output.joos";

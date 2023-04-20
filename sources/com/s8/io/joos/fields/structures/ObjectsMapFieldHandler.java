@@ -148,7 +148,7 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 				
 				value = entry.getValue();
 				TypeHandler typeHandler = enclosedScope.getTypeHandler(value);
-				typeHandler.compose(value, enclosedScope);				
+				typeHandler.compose(value, enclosedScope, typeHandler == this.defaultTypeHandler);				
 			};
 			enclosedScope.close();
 			return true;

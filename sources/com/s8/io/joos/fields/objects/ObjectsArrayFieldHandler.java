@@ -126,7 +126,7 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 					
 					enclosedScope.newItem();
 					TypeHandler typeHandler = enclosedScope.getTypeHandler(item);
-					typeHandler.compose(item, enclosedScope);					
+					typeHandler.compose(item, enclosedScope, typeHandler == this.componentTypeHandler);					
 				}			
 			}
 			enclosedScope.close();

@@ -216,13 +216,14 @@ public class TypeHandler {
 	}
 
 
-	public void compose(Object object, ComposingScope scope) 
+	public void compose(Object object, ComposingScope scope, boolean isDefault) 
 			throws JOOS_ComposingException, IOException {
 
 		// declare type
-		scope.append('(');
-		scope.append(name);
-		scope.append(')');
+		if(!isDefault) {
+			scope.append(name);
+			scope.append('(');			
+		}
 
 		// begin body
 		ComposingScope enclosedScope = scope.enterSubscope('{', '}', true);
@@ -233,6 +234,9 @@ public class TypeHandler {
 			fieldHandler.compose(object, enclosedScope);
 		}
 		enclosedScope.close();
+		if(!isDefault) {
+			scope.append(')');	
+		}
 	}
 
 }

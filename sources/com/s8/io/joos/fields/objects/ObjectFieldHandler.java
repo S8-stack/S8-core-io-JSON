@@ -54,7 +54,7 @@ public class ObjectFieldHandler extends FieldHandler {
 		
 		@Override
 		public void compile(JOOS_Lexicon.Builder lexiconBuilder) {
-			handler.fieldType = lexiconBuilder.getByClassName(fieldType);
+			handler.fieldTypeHandler = lexiconBuilder.getByClassName(fieldType);
 		}
 
 
@@ -67,9 +67,9 @@ public class ObjectFieldHandler extends FieldHandler {
 	
 
 	/**
-	 * 
+	 * Default type
 	 */
-	public TypeHandler fieldType;
+	public TypeHandler fieldTypeHandler;
 
 	private ObjectFieldHandler(String name, Field field) {
 		super(name, field);
@@ -105,7 +105,7 @@ public class ObjectFieldHandler extends FieldHandler {
 
 			// declare type
 			TypeHandler typeHandler = scope.getTypeHandler(value);
-			typeHandler.compose(value, scope);
+			typeHandler.compose(value, scope, typeHandler == this.fieldTypeHandler);
 			return true;
 		}
 		else {
@@ -115,7 +115,7 @@ public class ObjectFieldHandler extends FieldHandler {
 
 	@Override
 	public ParsingScope openScope(Object parent) {
-		return new ObjectScope(fieldType) {
+		return new ObjectScope(fieldTypeHandler) {
 			public @Override void onParsed(Object child) throws JOOS_ParsingException {
 				try {
 					ObjectFieldHandler.this.set(parent, child);

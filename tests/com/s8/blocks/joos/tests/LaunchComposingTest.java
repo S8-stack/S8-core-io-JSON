@@ -44,12 +44,11 @@ public class LaunchComposingTest {
 			root.others.add(newType2);			
 		}
 
-		JOOS_Lexicon context = new JOOS_Lexicon();
-		context.discover(MyRootType.class);
+		JOOS_Lexicon context = JOOS_Lexicon.from(MyRootType.class);
 		
 
 
-		String pathname = "data/V2_test_output.joos";
+		String pathname = "data/V2_test_output.js";
 		RandomAccessFile file = new RandomAccessFile(new File(pathname), "rws");
 
 		JOOS_BufferedFileWriter writer = new JOOS_BufferedFileWriter(file.getChannel(), StandardCharsets.UTF_8, 64);
