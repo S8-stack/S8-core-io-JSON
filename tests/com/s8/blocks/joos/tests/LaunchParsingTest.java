@@ -28,14 +28,14 @@ public class LaunchParsingTest {
 	 */
 	public static void main(String[] args) throws IOException, JOOS_CompilingException {
 
-		JOOS_Lexicon context = new JOOS_Lexicon();
+		JOOS_Lexicon context = JOOS_Lexicon.from(MyRootType.class);
 		
-	
+
+		System.out.println("Go!");
 		
-		context.discover(MyRootType.class);
 
 
-		String pathname = "data/V2_test_input.joos";
+		String pathname = "data/V2_test_input2.js";
 
 		RandomAccessFile file = new RandomAccessFile(new File(pathname), "r");
 

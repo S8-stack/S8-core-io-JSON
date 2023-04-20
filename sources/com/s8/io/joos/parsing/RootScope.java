@@ -20,61 +20,69 @@ public class RootScope extends ParsingScope {
 
 	public RootScope() {
 		super();
-		state = new State() {
+		state = new Opening2();
+	}
+	
+	
+	private class Opening2 extends ParsingState {
+
+		@Override
+		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
+				throws JOOS_ParsingException, IOException {
 			
-			@Override
-			public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
-					throws JOOS_ParsingException, IOException {
+			// skip leading white spaces
+			reader.skip('\n', '\t', ' ');
 
-				// initiate
-				reader.readNext();
 
-				// skip leading white spaces
-				reader.skipWhiteSpaces();
+			reader.checkSequence("const ");
+			reader.skip('\n', '\t', ' ');
+			reader.checkSequence("ROOT");
+			reader.skip('\n', '\t', ' ');
+			reader.checkSequence("=");
+
+			reader.moveNext();
+			
+			
+			state = new Closing();
+			
+			parser.pushScope(new ObjectScope(null) {
 				
-				String name = reader.until(new char[] { ':' }, null, new char[] { '}', ')', '{', '('});
-				
-				if(name.equals("root")){
-					
-					// consume ':'
-					reader.readNext();
-					reader.skipWhiteSpaces();
-					
-					parser.pushScope(new ObjectScope(new OnParsedObject() {
-						
-						@Override
-						public void set(Object value) throws JOOS_ParsingException {
-							result = value;
-						}
-					}));
-					
-					state = new State() {
-						
-						@Override
-						public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
-								throws JOOS_ParsingException, IOException {
-							parser.popScope();
-							return false;
-						}
-					};
+				@Override
+				public void onParsed(Object object) throws JOOS_ParsingException {
+					result = object;
 				}
-				else{
-					throw new JOOS_ParsingException("First declaration must be root, read: >"+name+"<");
-				}
-				return false;
-			}
-		};
+			});
+			
+			return false;
+		}
+		
+	}
+	
+
+	
+	private class Closing extends ParsingState {
+
+		@Override
+		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
+				throws JOOS_ParsingException, IOException {
+			
+			// skip leading white spaces
+			reader.skip('\n', '\t', ' ');
+
+
+			reader.check(';');
+		
+			parser.popScope();
+			
+			return false;
+		}
+		
 	}
 
 
 	@Override
 	public ScopeType getType() {
 		return ScopeType.MAPPED;
-	}
-
-	@Override
-	public boolean isClosedBy(char c) {
-		return '}'==c;
 	}
 
 }

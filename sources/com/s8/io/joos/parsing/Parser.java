@@ -32,6 +32,7 @@ public class Parser {
 	public Parser(JOOS_Lexicon context, StreamReader reader, boolean isVerbose) {
 		super();
 		this.reader = reader;
+		
 		//rootBuilder = new RootParsedElement(context);
 
 		this.isVerbose = isVerbose;
@@ -61,6 +62,10 @@ public class Parser {
 	 * @throws Exception
 	 */
 	public Object parse() throws JOOS_ParsingException, IOException {
+		
+		// initialize reader
+		reader.moveNext();
+		
 		scopes = new Stack<>();
 		
 		RootScope rootHandle = new RootScope();
@@ -69,6 +74,9 @@ public class Parser {
 		ParsingScope scope;
 		while(!scopes.isEmpty()) {
 			scope = scopes.peek();
+			if(scope.state == null) {
+				throw new JOOS_ParsingException("No state defined for scope: "+scope);
+			}
 			while(scope.state.parse(this, reader, isVerbose));
 		}
 		return rootHandle.result;

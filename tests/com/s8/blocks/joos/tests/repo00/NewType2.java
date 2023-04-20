@@ -3,7 +3,7 @@ package com.s8.blocks.joos.tests.repo00;
 import com.s8.io.joos.JOOS_Field;
 import com.s8.io.joos.JOOS_Type;
 
-@JOOS_Type(name="NewType2", sub= {NewType3.class})
+@JOOS_Type(name="newType2", sub= {NewType3.class})
 public class NewType2 {
 
 	@JOOS_Field(name="a")

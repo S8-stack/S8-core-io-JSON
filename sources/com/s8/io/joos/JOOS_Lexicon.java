@@ -3,6 +3,7 @@ package com.s8.io.joos;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
@@ -31,6 +32,9 @@ public class JOOS_Lexicon {
 		JOOS_Lexicon lexicon = new JOOS_Lexicon();
 		Builder builder = lexicon.new Builder();
 		for(Class<?> type : types) { builder.discover(type); }
+		
+		builder.build();
+		
 		return lexicon;
 	}
 
@@ -45,9 +49,9 @@ public class JOOS_Lexicon {
 
 		private final FieldHandlerFactory fieldHandlerFactory;
 
-		public Queue<Class<?>> buffer;
+		public Queue<Class<?>> buffer = new LinkedList<>();
 
-		private Map<String, TypeHandler.Builder> builders = new HashMap<String, TypeHandler.Builder>();
+		private Map<String, TypeHandler.Builder> typeBuilders = new HashMap<String, TypeHandler.Builder>();
 
 
 		public Builder() {
@@ -81,13 +85,13 @@ public class JOOS_Lexicon {
 			while(!buffer.isEmpty()) {
 				
 				Class<?> type = buffer.poll();
-				if(!builders.containsKey(type.getName())) {
+				if(!typeBuilders.containsKey(type.getName())) {
 					
 					TypeHandler handler = new TypeHandler(type);
 					TypeHandler.Builder typeBuilder = handler.new Builder();
 					
 					// store
-					builders.put(type.getName(), typeBuilder);
+					typeBuilders.put(type.getName(), typeBuilder);
 					
 					
 					typeBuilder.build(fieldHandlerFactory);
@@ -98,8 +102,14 @@ public class JOOS_Lexicon {
 
 			
 			
-			builders.forEach((nkey, builder) -> {
+			typeBuilders.forEach((nkey, builder) -> {
 				builder.compile(this);
+			});
+			
+			
+			typeBuilders.forEach((name, typeBuilder) -> {
+				TypeHandler typeHandler = typeBuilder.getHandler();
+				typeHandlers.put(typeHandler.getName(), typeHandler);
 			});
 		}
 
@@ -126,14 +136,14 @@ public class JOOS_Lexicon {
 		 * @return
 		 */
 		public TypeHandler getByClassName(Class<?> type){
-			return builders.get(type.getName()).getHandler();
+			return typeBuilders.get(type.getName()).getHandler();
 		}
 	}
 
 	/**
 	 * root Types: the only allowed types to start a joos file in the context of this engine instance
 	 */
-	private Map<String, TypeHandler> types = new HashMap<String, TypeHandler>();
+	private Map<String, TypeHandler> typeHandlers = new HashMap<String, TypeHandler>();
 
 
 
@@ -166,13 +176,13 @@ public class JOOS_Lexicon {
 		}
 
 		String name = annotation.name();
-		TypeHandler typeHandler = types.get(name);
+		TypeHandler typeHandler = typeHandlers.get(name);
 		return typeHandler;
 	}
 
 
 	public TypeHandler get(String name){
-		return types.get(name);
+		return typeHandlers.get(name);
 	}
 
 

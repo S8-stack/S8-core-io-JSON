@@ -8,7 +8,7 @@ import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.PrimitiveFieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ParsingScope;
-import com.s8.io.joos.parsing.PrimitiveScope;
+import com.s8.io.joos.parsing.QuotedScope;
 
 
 
@@ -38,8 +38,10 @@ public class StringFieldHandler extends PrimitiveFieldHandler {
 
 	@Override
 	public ParsingScope openScope(Object object) {
-		return new PrimitiveScope() {
-			public @Override void setValue(String value) throws JOOS_ParsingException {
+		return new QuotedScope() {
+			
+			@Override
+			public void setValue(String value) throws JOOS_ParsingException {
 				try {
 					field.set(object, value);
 				} catch (IllegalAccessException | IllegalArgumentException e) {

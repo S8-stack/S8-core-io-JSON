@@ -3,7 +3,7 @@ package com.s8.blocks.joos.tests.repo00;
 import com.s8.io.joos.JOOS_Field;
 import com.s8.io.joos.JOOS_Type;
 
-@JOOS_Type(name="MyOtherObject2")
+@JOOS_Type(name="myOtherObject2")
 public class MyOtherObject2 {
 	
 	@JOOS_Field(name="coeficients")

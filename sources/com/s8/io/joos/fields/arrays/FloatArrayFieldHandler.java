@@ -3,14 +3,16 @@ package com.s8.io.joos.fields.arrays;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.s8.io.joos.ParsingException;
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.fields.PrimitivesArrayFieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
+import com.s8.io.joos.parsing.ArrayScope;
 import com.s8.io.joos.parsing.ParsingScope;
-import com.s8.io.joos.parsing.PrimitiveScope;
-import com.s8.io.joos.parsing.PrimitivesArrayScope;
+import com.s8.io.joos.parsing.AlphaNumericScope;
 
 
 /**
@@ -47,48 +49,38 @@ public class FloatArrayFieldHandler extends PrimitivesArrayFieldHandler {
 		scope.append(Float.toString(Array.getFloat(array, index)));
 	}
 
+
 	@Override
 	public ParsingScope openScope(Object object) {
-		return new FloatArrayScope(object);
-	}
-
-
-	private class FloatArrayScope extends PrimitivesArrayScope<Float> {
-
-		public FloatArrayScope(Object object) {
-			super(float.class, object);
-		}
-
-		@Override
-		public ParsingScope openItemScope() throws JOOS_ParsingException {
-			return new PrimitiveScope() {
-
-				@Override
-				public void setValue(String value) throws JOOS_ParsingException, ParsingException {
-					values.add(Float.valueOf(value));
-				}
-			};
-		}
-
-		@Override
-		public void close() throws JOOS_ParsingException {
-			int length = values.size();
-			float[] array = new float[length];
-			for(int i=0; i<length; i++) {
-				array[i] = values.get(i);
-			}
-			setValue(array);
-		}
 		
-		@Override
-		public void setValue(Object value) throws JOOS_ParsingException {
-			try {
-				FloatArrayFieldHandler.this.set(object, value);
+		return new ArrayScope() {
+			private List<Float> values = new ArrayList<>();
+			
+			@Override
+			public ParsingScope openItemScope() throws JOOS_ParsingException {
+				return new AlphaNumericScope() {
+					@Override
+					public void setValue(String value) throws JOOS_ParsingException, ParsingException {
+						values.add(Float.valueOf(value));
+					}
+				};
 			}
-			catch (IllegalArgumentException | IllegalAccessException e) {
-				throw new JOOS_ParsingException("Failed to set object due to "+e.getMessage());
+
+			@Override
+			public void close() throws JOOS_ParsingException {
+				int length = values.size();
+				float[] array = new float[length];
+				for(int i=0; i<length; i++) {
+					array[i] = values.get(i);
+				}
+				try {
+					FloatArrayFieldHandler.this.set(object, array);
+				}
+				catch (IllegalArgumentException | IllegalAccessException e) {
+					throw new JOOS_ParsingException("Failed to set object due to "+e.getMessage());
+				}
 			}
-		}	
+		};
 	}
 
 }

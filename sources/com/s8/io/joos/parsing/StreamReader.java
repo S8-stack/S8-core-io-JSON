@@ -2,8 +2,6 @@ package com.s8.io.joos.parsing;
 
 import java.io.IOException;
 
-import com.s8.io.joos.JOOS_Syntax;
-
 /**
  * 
  * 
@@ -16,6 +14,8 @@ import com.s8.io.joos.JOOS_Syntax;
 public class StreamReader {
 
 	public static final boolean IS_DEBUG_ENABLED = true;
+
+	private static final int TAB_LENGTH = 3;
 
 	private JOOS_Reader reader;
 
@@ -45,25 +45,6 @@ public class StreamReader {
 	}
 
 
-	/**
-	 * check (do not read next)
-	 * 
-	 * @param sequence
-	 * @throws IOException 
-	 * @throws Exception
-	 */
-	public void check(String sequence) throws JOOS_ParsingException, IOException {
-		int n=sequence.length();
-		for(int i=0; i<n; i++){
-			if(c!=sequence.charAt(i)){
-				throw new JOOS_ParsingException(line, column,
-						"Unexpected sequence encountered while deserializing");
-			}
-			if(i<n-1){
-				readNext();	
-			}
-		}
-	}
 
 	/**
 	 * check (do not read next)
@@ -94,89 +75,43 @@ public class StreamReader {
 
 
 
-	/**
-	 * WARNING : /!\Read from current char. Stop on one of <code>stopping</code>.
-	 * @param stopping
-	 * @param ignored
-	 * @param forbidden
-	 * @return
-	 * @throws Exception
-	 */
-	public String until(char[] stopping, char[] ignored, char[] forbidden) throws JOOS_ParsingException, IOException{
-		StringBuilder builder = new StringBuilder();
-		while(true) {
-			if(isOneOf(stopping)){
-				return builder.toString();
-			}
-			else if(isOneOf(forbidden)){
-				throw new JOOS_ParsingException(line, column,
-						"Forbidden char has been found>"+((char)c)+"<");
-			}
-			else if(isOneOf(ignored)){
-				// skipped
-			}
-			else{
-				builder.append((char) c);
-			}
-			readNext();
-		}
-	}
-
 
 	/**
 	 * 
-	 * @param ignored
-	 * @param forbidden
-	 * @throws Exception
+	 * @param sequence
+	 * @throws JOOS_ParsingException
+	 * @throws IOException
 	 */
-	public void next(char[] ignored, char[] forbidden, boolean isSkippingWhiteSpace) throws JOOS_ParsingException, IOException {
-		boolean isNext = false;
-		while(!isNext) {
-			moveNext(isSkippingWhiteSpace);
-
-			if(isOneOf(forbidden)){
-				throw new JOOS_ParsingException(line, column, "Forbidden char has been found");
+	public void checkSequence(String sequence) throws JOOS_ParsingException, IOException {
+		if(isRunning){
+			int n = sequence.length();
+			for(int i = 0; i < n; i++) {
+				char expectedChar = sequence.charAt(i);
+				if(c != expectedChar) {
+					throw new JOOS_ParsingException(line, column, "Sequence not matching");
+				}
+				moveNext();
 			}
-			else if(isOneOf(ignored)){
-				// skipped
-			}
-			else{
-				isNext = true;
-			}
+		}
+		else{
+			throw new JOOS_ParsingException(line, column, "Attempting to read closed stream");
 		}
 	}
 
-	public void next(char[] ignored, boolean isSkippingWhiteSpace) throws JOOS_ParsingException, IOException {
-		boolean isNext = false;
-		while(!isNext) {
-			moveNext(isSkippingWhiteSpace);
-			if(isOneOf(ignored)){
-				// skipped
-			}
-			else{
-				isNext = true;
-			}
-		}
-	}
 
-	
-	public void moveNext() throws JOOS_ParsingException, IOException {
-		moveNext(true, true, true);
-	}
-
-	/**
-	 * base methof for reading next char
-	 * @throws IOException 
-	 * @throws Exception
-	 */
-	public void moveNext(
-			boolean isSkippingEndOfLine, 
-			boolean isSkippingTab, 
-			boolean isSkippingWhiteSpace) throws JOOS_ParsingException, IOException {
+	public void moveNext() throws IOException, JOOS_ParsingException {
 		if(isRunning){
 			boolean isNext = false;
 			while(!isNext) {
+
+				/* update position before consuming current char */
+				if(c == '\n') { line++; }
+				if(c == '\t') { column+= TAB_LENGTH; }
+				else { column++; }
+
+				/* read next char */
 				c = reader.read();
+
 				if(IS_DEBUG_ENABLED){
 					System.out.print((char) c);
 				}
@@ -185,20 +120,7 @@ public class StreamReader {
 					isNext = true;
 					// end normally
 				}
-				else if(isSkippingEndOfLine && c == '\n'){
-					line++;
-					column=0;
-					isNext = false; // skipped
-				}
 				else if(c=='\r'){ // always skipped
-					// skipped
-				}
-				else if(isSkippingTab && c == '\t'){
-					column+=5;
-					// skipped
-				}
-				else if(isSkippingWhiteSpace && c == ' '){
-					column+=1;
 					// skipped
 				}
 				/*
@@ -217,8 +139,29 @@ public class StreamReader {
 			throw new JOOS_ParsingException(line, column, "Attempting to read closed stream");
 		}
 	}
-	
-	
+
+
+	/**
+	 * WARNING : /!\Read from current char
+	 * 
+	 * @param skipped
+	 * @throws IOException
+	 * @throws XML_ParsingException
+	 */
+	public void skip(char... skipped) throws IOException, JOOS_ParsingException {
+		while(isOneOf(skipped)){
+			moveNext();
+		}
+	}
+
+
+
+	public void moveToNextSymbol() throws JOOS_ParsingException, IOException {
+		moveNext();
+		skip('\n', '\t', ' ');
+	}
+
+
 	/**
 	 * 
 	 * @return
@@ -228,61 +171,13 @@ public class StreamReader {
 	public String readAlphanumericChain() throws JOOS_ParsingException, IOException {
 		StringBuilder builder = new StringBuilder();
 		while(isAlphanumeric()) {
-			builder.append(c);
-			moveNext(false, false, false);
-		}
-		return builder.toString();
-	}
-
-	/**
-	 * read next char until reading end char
-	 * 
-	 * @param stoppingChars
-	 * @return
-	 * @throws IOException 
-	 * @throws JOOS_ParsingException 
-	 * @throws Exception
-	 */
-	public String readBlock(int length) throws JOOS_ParsingException, IOException {
-		StringBuilder builder = new StringBuilder();
-		int i=0;
-		while(i<length){
-
-			c = reader.read();
-
-			if(IS_DEBUG_ENABLED){
-				System.out.print((char) c);
-			}
-
 			builder.append((char) c);
-			i++;
+			moveNext();
 		}
 		return builder.toString();
 	}
 
 
-	/**
-	 * read next char until reading end char
-	 * 
-	 * @param stoppingChars
-	 * @return
-	 * @throws Exception
-	 */
-	public String readUntilOneOf(char... stoppingChars) throws Exception{
-		StringBuilder builder = new StringBuilder();
-		while(true){
-			readNext();
-			if(isOneOf(stoppingChars)){
-				return builder.toString();	
-			}
-			else if(c==-1){
-				throw new Exception("Unexpected end of stream");
-			}
-			else{
-				builder.append((char) c);
-			}
-		}
-	}
 
 
 	/**
@@ -314,35 +209,6 @@ public class StreamReader {
 	}
 
 
-	public void readNextWhileIgnoring(char... ignoredChars) throws IOException, JOOS_ParsingException {
-		readNext();
-		if(IS_DEBUG_ENABLED){
-			System.out.print((char) c);
-		}
-		while(isOneOf(ignoredChars)){
-			c = reader.read();
-		}
-	}
-
-	public void skipWhiteSpaces() throws IOException, JOOS_ParsingException {
-		while(c==JOOS_Syntax.WHITE_SPACE){
-			readNext();
-		}
-	}
-
-
-	/**
-	 * WARNING : /!\Read from current char
-	 * 
-	 * @param skipped
-	 * @throws IOException
-	 * @throws XML_ParsingException
-	 */
-	public void skip(char... skipped) throws IOException, JOOS_ParsingException {
-		while(isOneOf(skipped)){
-			readNext();
-		}
-	}
 
 
 
@@ -350,9 +216,6 @@ public class StreamReader {
 		return (char) c;
 	}
 
-	public boolean isCurrent(char comparedChar){
-		return ((char) c)==comparedChar;
-	}
 
 
 	/**
@@ -379,7 +242,16 @@ public class StreamReader {
 		return (c >= '0' & c <= '9') || // number
 				(c >= 'a' && c <= 'z') || // letter lower case
 				(c >= 'A' && c <= 'Z') || // letter (upper case)
-				(c == '-' || c == '_' || c == '@'); // special characters
+
+				/* <special-characters> */
+				c == '-' || 
+				c == '_' || 
+				c == '.' || 
+				c == '&' || 
+				c == '*' || 
+				c == '$' || 
+				c == '@'; 
+		
 	}
 
 	@Override

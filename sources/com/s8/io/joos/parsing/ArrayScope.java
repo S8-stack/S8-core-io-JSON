@@ -10,7 +10,7 @@ import java.io.IOException;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
-public abstract class ListScope extends ParsingScope {
+public abstract class ArrayScope extends ParsingScope {
 
 	@Override
 	public ScopeType getType() {
@@ -20,7 +20,7 @@ public abstract class ListScope extends ParsingScope {
 	public abstract ParsingScope openItemScope() throws JOOS_ParsingException;
 
 
-	public ListScope() {
+	public ArrayScope() {
 		super();
 		state = new ReadHeader();		
 	}
@@ -28,12 +28,15 @@ public abstract class ListScope extends ParsingScope {
 
 
 
-	public class ReadHeader extends State {
+	public class ReadHeader extends ParsingState {
 
 		@Override
 		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose) 
 				throws JOOS_ParsingException, IOException {
 			// check type declaration start sequence
+			
+			// skip any leading chars
+			reader.skip('\n', '\t', ' ');
 			
 			reader.check('[');
 
@@ -43,7 +46,7 @@ public abstract class ListScope extends ParsingScope {
 	}
 
 
-	public class ReadItem extends State {
+	public class ReadItem extends ParsingState {
 
 		private boolean isFirst;
 		
@@ -58,15 +61,22 @@ public abstract class ListScope extends ParsingScope {
 			if(isFirst) {
 				/* previous state reading stopped on '{', so move next */ 
 				reader.check('[');
+			
+				// reader move from previous sub-scope
+				reader.moveNext();
+				reader.skip('\n', '\t', ' ');
 			}
 			else {
-
-				// close previous scope
-				reader.moveNext();
+				// reader move from previous sub-scope
+				reader.skip('\n', '\t', ' ');
 				
-				if(reader.is(',')) { reader.moveNext(); }
+				// if comma continue
+				if(reader.is(',')) { 
+					reader.moveNext();
+					reader.skip('\n', '\t', ' ');
+				}
 			}
-			
+	
 			
 			/* has something to open */
 			if(reader.isOneOf('[', '{', '"', '\'') || reader.isAlphanumeric()){
@@ -84,7 +94,10 @@ public abstract class ListScope extends ParsingScope {
 			}
 			else if(reader.is(']')){
 				
-			
+				/* consume ending character */
+				reader.moveNext();
+				
+				
 				/* close the current scope */
 				close();
 

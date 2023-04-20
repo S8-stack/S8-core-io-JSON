@@ -10,7 +10,7 @@ import java.io.IOException;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
-public abstract class MappedScope extends ParsingScope {
+public abstract class MapScope extends ParsingScope {
 
 	@Override
 	public ScopeType getType() {
@@ -22,13 +22,13 @@ public abstract class MappedScope extends ParsingScope {
 	public abstract ParsingScope openEntry(String declarator) throws JOOS_ParsingException;
 	
 
-	public MappedScope() {
+	public MapScope() {
 		super();
 		state = new ReadEntry(true);
 	}
 
 
-	public class ReadEntry extends State {
+	public class ReadEntry extends ParsingState {
 
 		private boolean isFirst;
 
@@ -41,17 +41,28 @@ public abstract class MappedScope extends ParsingScope {
 		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
 				throws JOOS_ParsingException, IOException {
 			
-			/* previous state reading stopped on '{' (first item) or ',' (next items) */ 
-			reader.check(isFirst ? '{' : ',');
+			if(isFirst) {
+				// skip any leading chars
+				reader.skip('\n', '\t', ' ');
 				
-			/* previous state reading stopped on '{', so move next (and skip white spaces, eol, tabs) */ 
-			reader.moveNext(); 
+				/* previous state reading stopped on '{' (first item) or ',' (next items) */ 
+				reader.check('{');
+				
+				reader.moveToNextSymbol();
+			}
+			else {
+				reader.skip('\n', '\t', ' ');
+				if(reader.is(',')) { 
+					reader.moveToNextSymbol();
+				}
+			}
 			
 			if(reader.isAlphanumeric()){
 				String declarator = reader.readAlphanumericChain();
 				
-				reader.moveNext(); 
+				reader.skip('\n', '\t', ' ');
 				reader.check(':');
+				reader.moveNext();
 				
 				/* dive into sub-scope */
 				parser.pushScope(openEntry(declarator));
@@ -67,6 +78,8 @@ public abstract class MappedScope extends ParsingScope {
 			}
 			else if(reader.is('}')){
 				
+				/* consumed scope closing char */
+				reader.moveNext();
 				
 				onExhausted();
 

@@ -6,7 +6,7 @@ import java.util.Map;
 import com.s8.io.joos.JOOS_Field;
 import com.s8.io.joos.JOOS_Type;
 
-@JOOS_Type(name="NewType")
+@JOOS_Type(name="newType")
 public class MyRootType {
 
 	@JOOS_Field(name="a")

@@ -31,6 +31,8 @@ public class TypeHandler {
 
 
 		private JOOS_Type typeAnnotation;
+		
+		Class<?>[] subTypes;
 
 		private List<FieldHandler.Builder> fieldBuilders;
 
@@ -43,6 +45,8 @@ public class TypeHandler {
 			if(typeAnnotation==null){
 				throw new RuntimeException("Missing annotation in type: "+type.getName());
 			}
+			
+			subTypes = typeAnnotation.sub();
 		}
 
 
@@ -106,7 +110,6 @@ public class TypeHandler {
 		 */
 		public void discover(JOOS_Lexicon.Builder lexiconBuilder) throws JOOS_CompilingException {
 
-			Class<?>[] subTypes = typeAnnotation.sub();
 			if(subTypes!=null){
 				for(Class<?> subType : subTypes){ lexiconBuilder.discover(subType); }
 			}
@@ -122,8 +125,15 @@ public class TypeHandler {
 		 * 
 		 * @param builder
 		 */
-		public void compile(JOOS_Lexicon.Builder builder) {
-			fieldBuilders.forEach(fieldBuilder -> fieldBuilder.compile(builder));
+		public void compile(JOOS_Lexicon.Builder lexiconBuilder) {
+			
+			if(subTypes!=null){
+				for(Class<?> subType : subTypes){ 
+					subTypeHandlers.add(lexiconBuilder.getByClassName(subType)); 
+				}
+			}
+			
+			fieldBuilders.forEach(fieldBuilder -> fieldBuilder.compile(lexiconBuilder));
 		}
 
 
@@ -150,7 +160,7 @@ public class TypeHandler {
 	/**
 	 * child types
 	 */
-	public List<TypeHandler> subTypes = new ArrayList<>();
+	public List<TypeHandler> subTypeHandlers = new ArrayList<>();
 
 	/**
 	 * field handlers

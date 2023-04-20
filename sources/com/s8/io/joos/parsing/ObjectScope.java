@@ -23,6 +23,9 @@ public abstract class ObjectScope extends ParsingScope {
 	}
 
 
+	/**
+	 * Can be null
+	 */
 	public final TypeHandler defaultType;
 	
 	private Object object;
@@ -33,6 +36,7 @@ public abstract class ObjectScope extends ParsingScope {
 	public ObjectScope(TypeHandler defaultType) {
 		super();
 		this.defaultType = defaultType;
+		state = new ReadOpening();
 	}
 
 
@@ -43,7 +47,7 @@ public abstract class ObjectScope extends ParsingScope {
 
 	
 
-	public class ReadOpening extends State {
+	private class ReadOpening extends ParsingState {
 
 
 		@Override
@@ -51,7 +55,8 @@ public abstract class ObjectScope extends ParsingScope {
 
 			String def = null;
 
-			reader.moveNext();
+			reader.skip('\n', '\t', ' ');
+			
 			if(reader.is('{')) {
 				isPolymorphic = false;
 				def = null;
@@ -62,7 +67,7 @@ public abstract class ObjectScope extends ParsingScope {
 				def = reader.readAlphanumericChain();
 			
 				reader.check('(');
-				reader.moveNext();
+				reader.moveToNextSymbol();
 				reader.check('{');
 			}
 			
@@ -73,11 +78,15 @@ public abstract class ObjectScope extends ParsingScope {
 				// handler
 				TypeHandler handler = (def != null) ? context.get(def) : defaultType;
 				
+				if(handler == null) {
+					throw new JOOS_ParsingException("Cannot parse since no defined type");
+				}
+				
 				// create object of this scope
 				object = handler.createInstance();
 
 				
-				parser.pushScope(new MappedScope() {
+				parser.pushScope(new MapScope() {
 					
 					@Override
 					public ParsingScope openEntry(String name) throws JOOS_ParsingException {
@@ -107,18 +116,19 @@ public abstract class ObjectScope extends ParsingScope {
 	
 	
 	
-	public class Closing extends State {
+	private class Closing extends ParsingState {
 
 		@Override
 		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
 				throws JOOS_ParsingException, IOException {
 
-			reader.check('}');
-			
+		
 			if(isPolymorphic) {
-				reader.moveNext();
+				reader.skip('\n', '\t', ' ');
 				reader.check(')');
+				reader.moveNext();
 			}
+			
 			
 			// object if now parsed
 			onParsed(object);

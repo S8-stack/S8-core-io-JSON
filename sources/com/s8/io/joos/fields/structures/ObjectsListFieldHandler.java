@@ -14,7 +14,7 @@ import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.FieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
-import com.s8.io.joos.parsing.ListScope;
+import com.s8.io.joos.parsing.ArrayScope;
 import com.s8.io.joos.parsing.ObjectScope;
 import com.s8.io.joos.parsing.ParsingScope;
 import com.s8.io.joos.types.JOOS_CompilingException;
@@ -153,7 +153,7 @@ public class ObjectsListFieldHandler extends FieldHandler {
 	@Override
 	public ParsingScope openScope(Object object) {
 		
-		return new ListScope() {
+		return new ArrayScope() {
 			
 			private List<Object> values = new ArrayList<>();
 			

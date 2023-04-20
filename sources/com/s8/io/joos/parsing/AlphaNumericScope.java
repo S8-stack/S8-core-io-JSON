@@ -15,41 +15,29 @@ import com.s8.io.joos.ParsingException;
  * @author pierreconvert
  *
  */
-public abstract class PrimitiveScope extends ParsingScope {
+public abstract class AlphaNumericScope extends ParsingScope {
 
 
 	
-	public PrimitiveScope() {
+	public AlphaNumericScope() {
 		super();
-		state = new State() {
+		state = new ParsingState() {
 			
 			@Override
 			public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
 					throws JOOS_ParsingException, IOException {
 
-				String value = null;
-				if(reader.is('"')) {
-					reader.readNext();
-					boolean isAggregating = true;
-					while(isAggregating) {
-						String chunk = reader.until(new char[]{'"', '\\'}, null, new char[]{});
-						value = value!=null ? value.concat(chunk) : chunk;
-						
-						if(reader.isCurrent('"')) {
-							isAggregating = false;
-						}
-						else { // must be escape backslash
-							reader.readNext();
-							// and aggregate from the escaped char (inclusive)
-						}
-					}
-					
-					reader.readNext();
+				reader.skip('\n', '\t', ' ');
+				if(!reader.isAlphanumeric()){
+					throw new JOOS_ParsingException(reader.line, reader.column, "Must be alpha numeric chain");
 				}
-				else {
-					value = reader.until(new char[]{',', '}', ']'}, null, null);	
-				}
+				String value = reader.readAlphanumericChain();
 
+				/*
+				 *  alphanumeric chain has been consumed 
+				 *  + 1 char (first non alphanumeric char)
+				 */
+				
 				try{
 					setValue(value);
 				}
@@ -83,9 +71,5 @@ public abstract class PrimitiveScope extends ParsingScope {
 	}
 
 
-	@Override
-	public boolean isClosedBy(char c) {
-		return true;
-	}
 
 }
