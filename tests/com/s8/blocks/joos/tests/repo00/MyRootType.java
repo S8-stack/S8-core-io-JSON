@@ -25,6 +25,7 @@ public class MyRootType {
 	public @JOOS_Field(name="others") List<NewType2> others;
 	
 	public @JOOS_Field(name="map") Map<String, NewType2> map;
+
 	
 	
 }
