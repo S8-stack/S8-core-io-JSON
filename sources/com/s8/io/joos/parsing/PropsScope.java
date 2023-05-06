@@ -10,7 +10,7 @@ import java.io.IOException;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
-public abstract class MapScope extends ParsingScope {
+public abstract class PropsScope extends ParsingScope {
 
 	@Override
 	public ScopeType getType() {
@@ -19,10 +19,10 @@ public abstract class MapScope extends ParsingScope {
 
 
 
-	public abstract ParsingScope openEntry(String declarator) throws JOOS_ParsingException;
+	public abstract ParsingScope openProperty(String declarator) throws JOOS_ParsingException;
 	
 
-	public MapScope() {
+	public PropsScope() {
 		super();
 		state = new ReadEntry(true);
 	}
@@ -57,27 +57,15 @@ public abstract class MapScope extends ParsingScope {
 				}
 			}
 			
-			if(reader.is('"')){
-				
-				reader.moveNext();
-				
-				StringBuilder keyBuilder = new StringBuilder();
-				while(!reader.isOneOf('"', '\n')) {
-					keyBuilder.append(reader.getCurrentChar());
-					reader.moveNext();
-				}
-				
-				/* consume scope closing char */
-				reader.moveNext();
-				
-				String key = keyBuilder.toString();
+			if(reader.isAlphanumeric()){
+				String declarator = reader.readAlphanumericChain();
 				
 				reader.skip('\n', '\t', ' ');
 				reader.check(':');
 				reader.moveNext();
 				
 				/* dive into sub-scope */
-				parser.pushScope(openEntry(key));
+				parser.pushScope(openProperty(declarator));
 
 				/* setup state as read next entry for next time calling parse on this scope*/
 				if(isFirst) {

@@ -1,7 +1,9 @@
-package com.s8.io.joos.fields.primitives;
+package com.s8.io.joos.fields.simples;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
@@ -13,23 +15,35 @@ import com.s8.io.joos.parsing.AlphaNumericScope;
 
 /**
  * 
- *
+ * 
+ * 
+ * 
  * @author Pierre Convert
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
- * 
+ *
  */
-public class DoubleFieldHandler extends PrimitiveFieldHandler {
+public class EnumFieldHandler extends PrimitiveFieldHandler {
+
 
 	public static class Builder extends PrimitiveFieldHandler.Builder {
 
 		public Builder(String name, Field field) {
 			super();
-			handler = new DoubleFieldHandler(name, field);
+			handler = new EnumFieldHandler(name, field);
 		}
 	}
 
-	public DoubleFieldHandler(String name, Field field) {
+
+	private Map<String, Object> map;
+
+	private EnumFieldHandler(String name, Field field) {
 		super(name, field);
+
+		Class<?> enumType = field.getType();
+		map = new HashMap<>();
+		for(Object enumInstance : enumType.getEnumConstants()){
+			map.put(enumInstance.toString(), enumInstance);
+		}
 	}
 
 
@@ -40,13 +54,15 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 			@Override
 			public void setValue(String value) throws JOOS_ParsingException {
 				try {
-					field.setDouble(object, Double.valueOf(value));
+					field.set(object, map.get(value));
 				} catch (IllegalAccessException | IllegalArgumentException e) {
-					throw new JOOS_ParsingException("Cannot deserialize double due to: "+e.getMessage());
+					throw new JOOS_ParsingException("Cannot set interger due to "+e.getMessage());
 				}
 			}
 		};
 	}
+
+
 
 	@Override
 	public boolean compose(Object object, ComposingScope scope) 
@@ -56,23 +72,27 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 		scope.append(name);
 		scope.append(": ");
 
+		Object item;
 		try {
-			scope.append(Double.toString(field.getDouble(object)));
+			item = field.get(object);
 		} 
-		catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+		catch (IllegalArgumentException | IllegalAccessException e) {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}
-
+		if(item!=null) {
+			scope.append(item.toString());
+		}
+		else {
+			scope.append("NONE");	
+		}
 		return true;
 	}
-
 
 	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
-		return Double.toString(field.getDouble(object));
+		return Short.toString(field.getShort(object));
 	}
 	 */
-
 }

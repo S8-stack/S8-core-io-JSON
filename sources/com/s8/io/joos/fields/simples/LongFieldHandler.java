@@ -1,4 +1,4 @@
-package com.s8.io.joos.fields.primitives;
+package com.s8.io.joos.fields.simples;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -15,32 +15,32 @@ import com.s8.io.joos.parsing.AlphaNumericScope;
 /**
  * 
  * 
+ * 
  * @author Pierre Convert
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
-public class ShortFieldHandler extends PrimitiveFieldHandler {
+public class LongFieldHandler extends PrimitiveFieldHandler {
 	
 	public static class Builder extends PrimitiveFieldHandler.Builder {
 
 		public Builder(String name, Field field) {
 			super();
-			handler = new ShortFieldHandler(name, field);
+			handler = new LongFieldHandler(name, field);
 		}
 	}
 	
-	private ShortFieldHandler(String name, Field field) {
+	private LongFieldHandler(String name, Field field) {
 		super(name, field);
 	}
-
-
 	
 	@Override
 	public ParsingScope openScope(Object object) {
 		return new AlphaNumericScope() {
-			public @Override void setValue(String value) throws JOOS_ParsingException {
+			@Override
+			public void setValue(String value) throws JOOS_ParsingException {
 				try {
-					field.setShort(object, Short.valueOf(value));
+					field.setLong(object, Long.valueOf(value));
 				} catch (IllegalAccessException | IllegalArgumentException e) {
 					throw new JOOS_ParsingException("Cannot set interger due to "+e.getMessage());
 				}
@@ -57,7 +57,7 @@ public class ShortFieldHandler extends PrimitiveFieldHandler {
 		scope.append(": ");
 		
 		try {
-			scope.append(Short.toString(field.getShort(object)));
+			scope.append(Long.toString(field.getLong(object)));
 		} 
 		catch (IllegalArgumentException | IllegalAccessException | IOException e) {
 			e.printStackTrace();
@@ -67,10 +67,14 @@ public class ShortFieldHandler extends PrimitiveFieldHandler {
 		return true;
 	}
 
+
+	
+
 	/*
 	@Override
 	public String get(Object object) throws IllegalArgumentException, IllegalAccessException {
-		return Short.toString(field.getShort(object));
+		return Long.toString(field.getLong(object));
 	}
 	*/
+
 }

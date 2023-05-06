@@ -1,6 +1,8 @@
 package com.s8.io.joos.fields;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,20 +14,21 @@ import com.s8.io.joos.fields.arrays.DoubleArrayFieldHandler;
 import com.s8.io.joos.fields.arrays.FloatArrayFieldHandler;
 import com.s8.io.joos.fields.arrays.IntegerArrayFieldHandler;
 import com.s8.io.joos.fields.arrays.LongArrayFieldHandler;
+import com.s8.io.joos.fields.arrays.ObjectsArrayFieldHandler;
 import com.s8.io.joos.fields.arrays.ShortArrayFieldHandler;
 import com.s8.io.joos.fields.arrays.StringArrayFieldHandler;
-import com.s8.io.joos.fields.objects.ObjectFieldHandler;
-import com.s8.io.joos.fields.objects.ObjectsArrayFieldHandler;
-import com.s8.io.joos.fields.primitives.BooleanFieldHandler;
-import com.s8.io.joos.fields.primitives.DoubleFieldHandler;
-import com.s8.io.joos.fields.primitives.EnumFieldHandler;
-import com.s8.io.joos.fields.primitives.FloatFieldHandler;
-import com.s8.io.joos.fields.primitives.IntegerFieldHandler;
-import com.s8.io.joos.fields.primitives.LongFieldHandler;
-import com.s8.io.joos.fields.primitives.ShortFieldHandler;
-import com.s8.io.joos.fields.primitives.StringFieldHandler;
-import com.s8.io.joos.fields.structures.ObjectsListFieldHandler;
-import com.s8.io.joos.fields.structures.ObjectsMapFieldHandler;
+import com.s8.io.joos.fields.lists.ObjectsListFieldHandler;
+import com.s8.io.joos.fields.lists.StringListFieldHandler;
+import com.s8.io.joos.fields.maps.ObjectsMapFieldHandler;
+import com.s8.io.joos.fields.simples.BooleanFieldHandler;
+import com.s8.io.joos.fields.simples.DoubleFieldHandler;
+import com.s8.io.joos.fields.simples.EnumFieldHandler;
+import com.s8.io.joos.fields.simples.FloatFieldHandler;
+import com.s8.io.joos.fields.simples.IntegerFieldHandler;
+import com.s8.io.joos.fields.simples.LongFieldHandler;
+import com.s8.io.joos.fields.simples.ObjectFieldHandler;
+import com.s8.io.joos.fields.simples.ShortFieldHandler;
+import com.s8.io.joos.fields.simples.StringFieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.types.JOOS_CompilingException;
 
@@ -149,10 +152,50 @@ public class FieldHandlerFactory {
 			}
 		}
 		else if(List.class.isAssignableFrom(fieldType)) {
-			return new ObjectsListFieldHandler.Builder(name, field);
+			Type actualComponentType = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+			
+			Class<?> componentType = null;
+			// if type is like: MySubObject<T>
+			if(actualComponentType instanceof ParameterizedType) {
+				componentType = (Class<?>) ((ParameterizedType) actualComponentType).getRawType();
+			}
+			// if type is simply like: MySubObject
+			else if(actualComponentType instanceof Class<?>){
+				componentType = (Class<?>) actualComponentType;
+			}
+			
+			if(componentType==String.class) {
+				return new StringListFieldHandler.Builder(name, field);
+			}
+			// array of object
+			else{
+				return new ObjectsListFieldHandler.Builder(name, field, componentType);
+			}
 		}
 		else if(Map.class.isAssignableFrom(fieldType)) {
-			return new ObjectsMapFieldHandler.Builder(name, field);
+			
+			Type[] typeVars = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
+
+
+			Type key = typeVars[0];
+			if(!key.equals(String.class)) {
+				throw new JOOS_CompilingException(field.getType(), "Only String are accetped as keys");
+			}
+
+			Type actualValueType = typeVars[1];
+
+			Class<?> componentType = null;
+			
+			// if type is like: MySubObject<T>
+			if(actualValueType instanceof ParameterizedType) {
+				componentType = (Class<?>) ((ParameterizedType) actualValueType).getRawType();
+			}
+			// if type is simply like: MySubObject
+			else if(actualValueType instanceof Class<?>){
+				componentType = (Class<?>) actualValueType;
+			}
+			
+			return new ObjectsMapFieldHandler.Builder(name, field, componentType);
 		}
 		// default to object
 		else{

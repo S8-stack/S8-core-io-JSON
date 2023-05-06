@@ -19,9 +19,10 @@ module com.s8.io.joos {
 	exports com.s8.io.joos.types;
 
 	exports com.s8.io.joos.fields;
-	exports com.s8.io.joos.fields.structures;
-	exports com.s8.io.joos.fields.primitives;
-	exports com.s8.io.joos.fields.objects;
+	exports com.s8.io.joos.fields.maps;
+	exports com.s8.io.joos.fields.simples;
+	exports com.s8.io.joos.fields.arrays;
+	exports com.s8.io.joos.fields.lists;
 	
 	exports com.s8.io.joos.utilities;
 	

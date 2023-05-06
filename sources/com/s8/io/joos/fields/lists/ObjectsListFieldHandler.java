@@ -1,10 +1,8 @@
-package com.s8.io.joos.fields.structures;
+package com.s8.io.joos.fields.lists;
 
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,8 +11,8 @@ import com.s8.io.joos.JOOS_Type;
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.FieldHandler;
-import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ArrayScope;
+import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ObjectScope;
 import com.s8.io.joos.parsing.ParsingScope;
 import com.s8.io.joos.types.JOOS_CompilingException;
@@ -36,8 +34,8 @@ public class ObjectsListFieldHandler extends FieldHandler {
 		
 		public ObjectsListFieldHandler handler;
 		
-		public Builder(String name, Field field) {
-			handler = new ObjectsListFieldHandler(name, field);
+		public Builder(String name, Field field, Class<?> componentType) {
+			handler = new ObjectsListFieldHandler(name, field, componentType);
 		}
 		
 
@@ -78,19 +76,9 @@ public class ObjectsListFieldHandler extends FieldHandler {
 	
 	public TypeHandler componentTypeHandler;
 
-	public ObjectsListFieldHandler(String name, Field field) {
+	public ObjectsListFieldHandler(String name, Field field, Class<?> componentType) {
 		super(name, field);
-
-		Type actualComponentType = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-		
-		// if type is like: MySubObject<T>
-		if(actualComponentType instanceof ParameterizedType) {
-			componentType = (Class<?>) ((ParameterizedType) actualComponentType).getRawType();
-		}
-		// if type is simply like: MySubObject
-		else if(actualComponentType instanceof Class<?>){
-			componentType = (Class<?>) actualComponentType;
-		}
+		this.componentType = componentType;
 	}
 
 	public void set(Object object, Object value) throws JOOS_ParsingException {

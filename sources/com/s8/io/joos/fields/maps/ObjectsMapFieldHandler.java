@@ -1,9 +1,7 @@
-package com.s8.io.joos.fields.structures;
+package com.s8.io.joos.fields.maps;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -39,51 +37,32 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 		/**
 		 * 
 		 */
-		public Class<?> valueType;
+		public Class<?> componentType;
 		
 		public final ObjectsMapFieldHandler handler;
 		
-		public Builder(String name, Field field) throws JOOS_CompilingException {
+		public Builder(String name, Field field, Class<?> componentType) throws JOOS_CompilingException {
 			handler = new ObjectsMapFieldHandler(name, field);
-			
-
-			Type[] typeVars = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-
-
-			Type key = typeVars[0];
-			if(!key.equals(String.class)) {
-				throw new JOOS_CompilingException(field.getType(), "Only String are accetped as keys");
-			}
-
-			Type actualValueType = typeVars[1];
-
-			// if type is like: MySubObject<T>
-			if(actualValueType instanceof ParameterizedType) {
-				valueType = (Class<?>) ((ParameterizedType) actualValueType).getRawType();
-			}
-			// if type is simply like: MySubObject
-			else if(actualValueType instanceof Class<?>){
-				valueType = (Class<?>) actualValueType;
-			}
+			this.componentType = componentType;
 		}
 		
 
 		@Override
 		public Class<?> getSubType() {
-			return valueType;
+			return componentType;
 		}
 
 		@Override
 		public void subDiscover(JOOS_Lexicon.Builder context) throws JOOS_CompilingException {
-			if(valueType!=null && valueType.getAnnotation(JOOS_Type.class)!=null) {
-				context.discover(valueType);	
+			if(componentType!=null && componentType.getAnnotation(JOOS_Type.class)!=null) {
+				context.discover(componentType);	
 			}
 		}
 
 
 		@Override
 		public void compile(JOOS_Lexicon.Builder lexiconBuilder) {
-			handler.defaultTypeHandler = lexiconBuilder.getByClassName(valueType);
+			handler.defaultTypeHandler = lexiconBuilder.getByClassName(componentType);
 		}
 		
 		@Override
@@ -165,11 +144,11 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 			private HashMap<String, Object> entries = new HashMap<String, Object>();
 			
 			@Override
-			public ParsingScope openEntry(String declarator) throws JOOS_ParsingException {
+			public ParsingScope openEntry(String key) throws JOOS_ParsingException {
 				return new ObjectScope(defaultTypeHandler) {
 					@Override
 					public void onParsed(Object object) throws JOOS_ParsingException {
-						entries.put(declarator, object);	
+						entries.put(key, object);	
 					}
 				};
 			}

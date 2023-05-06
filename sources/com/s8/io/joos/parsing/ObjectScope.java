@@ -86,10 +86,10 @@ public abstract class ObjectScope extends ParsingScope {
 				object = handler.createInstance();
 
 				
-				parser.pushScope(new MapScope() {
+				parser.pushScope(new PropsScope() {
 					
 					@Override
-					public ParsingScope openEntry(String name) throws JOOS_ParsingException {
+					public ParsingScope openProperty(String name) throws JOOS_ParsingException {
 						FieldHandler fieldHandler = handler.getFieldHandler(name);
 						if(fieldHandler==null){
 							throw new JOOS_ParsingException("Unknown field: "+name);

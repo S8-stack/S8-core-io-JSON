@@ -1,4 +1,4 @@
-package com.s8.io.joos.fields.objects;
+package com.s8.io.joos.fields.simples;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
