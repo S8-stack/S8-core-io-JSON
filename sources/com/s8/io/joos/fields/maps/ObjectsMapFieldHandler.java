@@ -113,7 +113,7 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 			// field description
 			scope.newItem();
 			scope.append(name);
-			scope.append(':');
+			scope.append(" : ");
 
 			ComposingScope enclosedScope = scope.enterSubscope('{', '}', true);
 
@@ -122,8 +122,11 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 			for(Entry<String, Object> entry : map.entrySet()) {
 
 				enclosedScope.newItem();
+				
+				scope.append('"');
 				scope.append(entry.getKey());
-				scope.append(": ");
+				scope.append('"');
+				scope.append(" : ");
 				
 				value = entry.getValue();
 				TypeHandler typeHandler = enclosedScope.getTypeHandler(value);
