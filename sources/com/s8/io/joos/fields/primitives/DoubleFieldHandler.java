@@ -1,14 +1,14 @@
 package com.s8.io.joos.fields.primitives;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.PrimitiveFieldHandler;
+import com.s8.io.joos.parsing.AlphaNumericScope;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ParsingScope;
-import com.s8.io.joos.parsing.AlphaNumericScope;
 
 
 /**
@@ -22,14 +22,14 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 
 	public static class Builder extends PrimitiveFieldHandler.Builder {
 
-		public Builder(String name, Field field) {
+		public Builder(String name) {
 			super();
-			handler = new DoubleFieldHandler(name, field);
+			handler = new DoubleFieldHandler(name);
 		}
 	}
 
-	public DoubleFieldHandler(String name, Field field) {
-		super(name, field);
+	public DoubleFieldHandler(String name) {
+		super(name);
 	}
 
 
@@ -40,8 +40,8 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 			@Override
 			public void setValue(String value) throws JOOS_ParsingException {
 				try {
-					field.setDouble(object, Double.valueOf(value));
-				} catch (IllegalAccessException | IllegalArgumentException e) {
+					setter.invoke(object, Double.valueOf(value));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new JOOS_ParsingException("Cannot deserialize double due to: "+e.getMessage());
 				}
 			}
@@ -57,9 +57,10 @@ public class DoubleFieldHandler extends PrimitiveFieldHandler {
 		scope.append(": ");
 
 		try {
-			scope.append(Double.toString(field.getDouble(object)));
+			double value = (double) getter.invoke(object, new Object[]{});
+			scope.append(Double.toString(value));
 		} 
-		catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+		catch (IllegalArgumentException | IllegalAccessException | IOException | InvocationTargetException e) {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}

@@ -2,8 +2,8 @@ package com.s8.io.joos.types;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,6 @@ import com.s8.io.joos.JOOS_Type;
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.FieldHandler;
-import com.s8.io.joos.fields.FieldHandlerFactory;
 
 /**
  * 
@@ -34,7 +33,7 @@ public class TypeHandler {
 		
 		Class<?>[] subTypes;
 
-		private List<FieldHandler.Builder> fieldBuilders;
+		private Map<String, FieldHandler.Builder> fieldBuilders;
 
 		public Builder() {
 			super();
@@ -50,7 +49,7 @@ public class TypeHandler {
 		}
 
 
-		public void build(FieldHandlerFactory factory) throws JOOS_CompilingException {
+		public void build(FieldHandlerGenerator factory) throws JOOS_CompilingException {
 
 			name = typeAnnotation.name();
 
@@ -78,10 +77,10 @@ public class TypeHandler {
 			FieldHandler.Builder fieldBuilder;
 			JOOS_Field fieldAnnotation;
 
-			fieldBuilders = new ArrayList<>();
+			fieldBuilders = new HashMap<>();
 
 			// for each method
-			for(Field field : type.getFields()){
+			for(Method method : type.getMethods()){
 
 				// look for input (setter)
 				fieldAnnotation = field.getAnnotation(JOOS_Field.class);
@@ -93,9 +92,9 @@ public class TypeHandler {
 					}
 
 					// create field handler
-					fieldBuilder = factory.create(field);
+					fieldBuilder = factory.create(method, fieldBuilders);
 
-					fieldBuilders.add(fieldBuilder);
+					
 
 					fieldHandlers.put(fieldAnnotation.name(), fieldBuilder.getHandler());
 				}

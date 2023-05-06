@@ -1,14 +1,14 @@
 package com.s8.io.joos.fields.primitives;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.PrimitiveFieldHandler;
+import com.s8.io.joos.parsing.AlphaNumericScope;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ParsingScope;
-import com.s8.io.joos.parsing.AlphaNumericScope;
 
 
 /**
@@ -23,14 +23,14 @@ public class IntegerFieldHandler extends PrimitiveFieldHandler {
 
 	public static class Builder extends PrimitiveFieldHandler.Builder {
 
-		public Builder(String name, Field field) {
+		public Builder(String name) {
 			super();
-			handler = new IntegerFieldHandler(name, field);
+			handler = new IntegerFieldHandler(name);
 		}
 	}
 
-	public IntegerFieldHandler(String name, Field field) {
-		super(name, field);
+	public IntegerFieldHandler(String name) {
+		super(name);
 	}
 
 
@@ -41,8 +41,8 @@ public class IntegerFieldHandler extends PrimitiveFieldHandler {
 			@Override
 			public void setValue(String value) throws JOOS_ParsingException {
 				try {
-					field.setInt(object, Integer.valueOf(value));
-				} catch (IllegalAccessException | IllegalArgumentException e) {
+					setter.invoke(object, Integer.valueOf(value));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new JOOS_ParsingException("Cannot set interger due to "+e.getMessage());
 				}
 			}
@@ -58,9 +58,10 @@ public class IntegerFieldHandler extends PrimitiveFieldHandler {
 		scope.append(": ");
 		
 		try {
-			scope.append(Integer.toString(field.getInt(object)));
+			int value = (int) getter.invoke(object, new Object[]{});
+			scope.append(Integer.toString(value));
 		} 
-		catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+		catch (IllegalArgumentException | IllegalAccessException | IOException | InvocationTargetException e) {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}

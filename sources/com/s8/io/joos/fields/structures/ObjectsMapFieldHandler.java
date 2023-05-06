@@ -1,18 +1,17 @@
 package com.s8.io.joos.fields.structures;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiConsumer;
 
 import com.s8.io.joos.JOOS_Lexicon;
 import com.s8.io.joos.JOOS_Type;
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
-import com.s8.io.joos.fields.FieldHandler;
+import com.s8.io.joos.fields.MapFieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.MapScope;
 import com.s8.io.joos.parsing.ObjectScope;
@@ -29,10 +28,10 @@ import com.s8.io.joos.types.TypeHandler;
  * 
  * 
  */
-public class ObjectsMapFieldHandler extends FieldHandler {
+public class ObjectsMapFieldHandler extends MapFieldHandler {
 	
 	
-	public static class Builder extends FieldHandler.Builder {
+	public static class Builder extends MapFieldHandler.Builder {
 
 
 
@@ -43,28 +42,9 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 		
 		public final ObjectsMapFieldHandler handler;
 		
-		public Builder(String name, Field field) throws JOOS_CompilingException {
-			handler = new ObjectsMapFieldHandler(name, field);
-			
-
-			Type[] typeVars = ((ParameterizedType) field.getGenericType()).getActualTypeArguments();
-
-
-			Type key = typeVars[0];
-			if(!key.equals(String.class)) {
-				throw new JOOS_CompilingException(field.getType(), "Only String are accetped as keys");
-			}
-
-			Type actualValueType = typeVars[1];
-
-			// if type is like: MySubObject<T>
-			if(actualValueType instanceof ParameterizedType) {
-				valueType = (Class<?>) ((ParameterizedType) actualValueType).getRawType();
-			}
-			// if type is simply like: MySubObject
-			else if(actualValueType instanceof Class<?>){
-				valueType = (Class<?>) actualValueType;
-			}
+		public Builder(String name, Class<?> valueType) {
+			handler = new ObjectsMapFieldHandler(name);
+			this.valueType = valueType;
 		}
 		
 
@@ -87,7 +67,7 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 		}
 		
 		@Override
-		public FieldHandler getHandler() {
+		public MapFieldHandler getHandler() {
 			return handler;
 		}
 
@@ -98,38 +78,45 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 	public TypeHandler defaultTypeHandler;
 
 
-	public ObjectsMapFieldHandler(String name, Field field) throws JOOS_CompilingException {
-		super(name, field);
+	public ObjectsMapFieldHandler(String name) {
+		super(name);
 	}
 	
 
-	public void set(Object object, Object child) throws IllegalArgumentException, IllegalAccessException {
-		field.set(object, child);
+	public void put(Object object, String key, Object value) throws JOOS_ParsingException {
+		try {
+			putter.invoke(object, key, value);
+		} 
+		catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+			throw new JOOS_ParsingException(e.getMessage());
+		}
 	}
 
 
-
-
-	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
-		return field.get(object);
-	}
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean compose(Object object, ComposingScope scope) throws JOOS_ComposingException, IOException {
 
 
 		// retrieve array
-		Map<String, Object> map = null;
+		Map<String, Object> map = new HashMap<>();
+		
+		BiConsumer<String, Object> consumer = new BiConsumer<String, Object>() {
+			@Override
+			public void accept(String key, Object value) {
+				map.put(key, value);
+			}
+		};
+		
 		try {
-			map = (Map<String, Object>) field.get(object);
+			traverser.invoke(object, consumer);
 		} 
-		catch (IllegalArgumentException | IllegalAccessException e) {
+		catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			throw new JOOS_ComposingException(e.getMessage());
 		}
 
 
-		if(map!=null) {
+		if(map.size() > 0) {
 
 			// field description
 			scope.newItem();
@@ -162,27 +149,22 @@ public class ObjectsMapFieldHandler extends FieldHandler {
 	public ParsingScope openScope(Object object) {
 		return new MapScope() {
 
-			private HashMap<String, Object> entries = new HashMap<String, Object>();
-			
 			@Override
-			public ParsingScope openEntry(String declarator) throws JOOS_ParsingException {
+			public ParsingScope openEntry(String key) throws JOOS_ParsingException {
 				return new ObjectScope(defaultTypeHandler) {
 					@Override
-					public void onParsed(Object object) throws JOOS_ParsingException {
-						entries.put(declarator, object);	
+					public void onParsed(Object value) throws JOOS_ParsingException {
+						put(object, key, value);	
 					}
 				};
 			}
 
 			@Override
 			public void onExhausted() throws JOOS_ParsingException {
-				try {
-					ObjectsMapFieldHandler.this.set(object, entries);
-				}
-				catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new JOOS_ParsingException("Failed to set object due to "+e.getMessage());
-				}
+				// do nothing
 			}
 		};
 	}
+
+
 }

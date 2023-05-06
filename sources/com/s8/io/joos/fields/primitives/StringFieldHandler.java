@@ -1,7 +1,7 @@
 package com.s8.io.joos.fields.primitives;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
@@ -25,14 +25,14 @@ public class StringFieldHandler extends PrimitiveFieldHandler {
 
 	public static class Builder extends PrimitiveFieldHandler.Builder {
 
-		public Builder(String name, Field field) {
+		public Builder(String name) {
 			super();
-			handler = new StringFieldHandler(name, field);
+			handler = new StringFieldHandler(name);
 		}
 	}
 	
-	public StringFieldHandler(String name, Field field) {
-		super(name, field);
+	public StringFieldHandler(String name) {
+		super(name);
 	}
 
 
@@ -43,8 +43,8 @@ public class StringFieldHandler extends PrimitiveFieldHandler {
 			@Override
 			public void setValue(String value) throws JOOS_ParsingException {
 				try {
-					field.set(object, value);
-				} catch (IllegalAccessException | IllegalArgumentException e) {
+					setter.invoke(object, value);
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new JOOS_ParsingException("Cannot deserialize String due to: "+e.getMessage());
 				}
 			}
@@ -56,9 +56,9 @@ public class StringFieldHandler extends PrimitiveFieldHandler {
 			throws IOException, JOOS_ComposingException  {
 		String value;
 		try {
-			value = (String) field.get(object);
-		} 
-		catch (IllegalArgumentException | IllegalAccessException e) {
+			value = (String) getter.invoke(object, new Object[]{});
+		}
+		catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}

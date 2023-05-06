@@ -1,7 +1,7 @@
 package com.s8.io.joos.fields;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import com.s8.io.joos.JOOS_Lexicon;
 import com.s8.io.joos.composing.ComposingScope;
@@ -18,6 +18,10 @@ import com.s8.io.joos.types.JOOS_CompilingException;
  *
  */
 public abstract class FieldHandler {
+	
+	public enum Kind {
+		SIMPLE, LIST, MAP;
+	}
 	
 	
 	public static abstract class Builder {
@@ -46,24 +50,21 @@ public abstract class FieldHandler {
 		 */
 		public abstract FieldHandler getHandler();
 		
+		
 	}
 	
+	public abstract Kind advertise();
 
 	/**
 	 * 
 	 */
 	public String name;
 
-	/**
-	 * 
-	 */
-	public Field field;
-
 	
-	public FieldHandler(String name, Field field) {
+	
+	public FieldHandler(String name) {
 		super();
 		this.name = name;
-		this.field = field;
 	}
 	
 

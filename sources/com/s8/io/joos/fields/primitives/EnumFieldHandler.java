@@ -1,16 +1,16 @@
 package com.s8.io.joos.fields.primitives;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.PrimitiveFieldHandler;
+import com.s8.io.joos.parsing.AlphaNumericScope;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ParsingScope;
-import com.s8.io.joos.parsing.AlphaNumericScope;
 
 
 /**
@@ -27,19 +27,18 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 
 	public static class Builder extends PrimitiveFieldHandler.Builder {
 
-		public Builder(String name, Field field) {
+		public Builder(String name, Class<?> enumType) {
 			super();
-			handler = new EnumFieldHandler(name, field);
+			handler = new EnumFieldHandler(name, enumType);
 		}
 	}
 
 
 	private Map<String, Object> map;
 
-	private EnumFieldHandler(String name, Field field) {
-		super(name, field);
+	private EnumFieldHandler(String name, Class<?> enumType) {
+		super(name);
 
-		Class<?> enumType = field.getType();
 		map = new HashMap<>();
 		for(Object enumInstance : enumType.getEnumConstants()){
 			map.put(enumInstance.toString(), enumInstance);
@@ -54,8 +53,8 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 			@Override
 			public void setValue(String value) throws JOOS_ParsingException {
 				try {
-					field.set(object, map.get(value));
-				} catch (IllegalAccessException | IllegalArgumentException e) {
+					setter.invoke(object, map.get(value));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new JOOS_ParsingException("Cannot set interger due to "+e.getMessage());
 				}
 			}
@@ -74,9 +73,9 @@ public class EnumFieldHandler extends PrimitiveFieldHandler {
 
 		Object item;
 		try {
-			item = field.get(object);
+			item = getter.invoke(object, new Object[]{});
 		} 
-		catch (IllegalArgumentException | IllegalAccessException e) {
+		catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}

@@ -1,14 +1,14 @@
 package com.s8.io.joos.fields.primitives;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.PrimitiveFieldHandler;
+import com.s8.io.joos.parsing.AlphaNumericScope;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ParsingScope;
-import com.s8.io.joos.parsing.AlphaNumericScope;
 
 
 /**
@@ -22,15 +22,15 @@ public class BooleanFieldHandler extends PrimitiveFieldHandler {
 	
 	public static class Builder extends PrimitiveFieldHandler.Builder {
 		
-		public Builder(String name, Field field) {
+		public Builder(String name) {
 			super();
-			handler = new BooleanFieldHandler(name, field);
+			handler = new BooleanFieldHandler(name);
 		}
 	}
 
 
-	private BooleanFieldHandler(String name, Field field) {
-		super(name, field);
+	private BooleanFieldHandler(String name) {
+		super(name);
 	}
 
 
@@ -46,8 +46,8 @@ public class BooleanFieldHandler extends PrimitiveFieldHandler {
 		return new AlphaNumericScope() {
 			public @Override void setValue(String value) throws JOOS_ParsingException {
 				try {
-					field.setBoolean(object, Boolean.valueOf(value));
-				} catch (IllegalAccessException | IllegalArgumentException e) {
+					setter.invoke(object, Boolean.valueOf(value));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new JOOS_ParsingException("Cannot deserialize boolean due to: "+e.getMessage());
 				}
 			}
@@ -64,9 +64,10 @@ public class BooleanFieldHandler extends PrimitiveFieldHandler {
 		scope.append(": ");
 		
 		try {
-			scope.append(Boolean.toString(field.getBoolean(object)));
+			boolean value = (boolean) getter.invoke(object, new Object[]{});
+			scope.append(Boolean.toString(value));
 		} 
-		catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+		catch (IllegalArgumentException | IllegalAccessException | IOException | InvocationTargetException e) {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}

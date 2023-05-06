@@ -1,14 +1,14 @@
 package com.s8.io.joos.fields.primitives;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.PrimitiveFieldHandler;
+import com.s8.io.joos.parsing.AlphaNumericScope;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ParsingScope;
-import com.s8.io.joos.parsing.AlphaNumericScope;
 
 
 /**
@@ -23,15 +23,15 @@ public class FloatFieldHandler extends PrimitiveFieldHandler {
 	
 	public static class Builder extends PrimitiveFieldHandler.Builder {
 
-		public Builder(String name, Field field) {
+		public Builder(String name) {
 			super();
-			handler = new FloatFieldHandler(name, field);
+			handler = new FloatFieldHandler(name);
 		}
 	}
 	
 	
-	public FloatFieldHandler(String name, Field field) {
-		super(name, field);
+	public FloatFieldHandler(String name) {
+		super(name);
 	}
 
 	
@@ -42,8 +42,8 @@ public class FloatFieldHandler extends PrimitiveFieldHandler {
 			@Override
 			public void setValue(String value) throws JOOS_ParsingException {
 				try {
-					field.setFloat(object, Float.valueOf(value));
-				} catch (IllegalAccessException | IllegalArgumentException e) {
+					setter.invoke(object, Float.valueOf(value));
+				} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 					throw new JOOS_ParsingException("Cannot deserialize double due to: "+e.getMessage());
 				}
 			}
@@ -59,9 +59,10 @@ public class FloatFieldHandler extends PrimitiveFieldHandler {
 		scope.append(": ");
 		
 		try {
-			scope.append(Float.toString(field.getFloat(object)));
+			float value = (float) getter.invoke(object, new Object[]{});
+			scope.append(Float.toString(value));
 		} 
-		catch (IllegalArgumentException | IllegalAccessException | IOException e) {
+		catch (IllegalArgumentException | IllegalAccessException | IOException | InvocationTargetException e) {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}

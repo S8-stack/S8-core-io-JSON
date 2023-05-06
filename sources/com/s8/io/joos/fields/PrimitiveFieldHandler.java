@@ -1,7 +1,6 @@
 package com.s8.io.joos.fields;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import com.s8.io.joos.JOOS_Lexicon;
 import com.s8.io.joos.composing.ComposingScope;
@@ -14,9 +13,9 @@ import com.s8.io.joos.composing.JOOS_ComposingException;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  * 
  */
-public abstract class PrimitiveFieldHandler extends FieldHandler {
+public abstract class PrimitiveFieldHandler extends SimpleFieldHandler {
 
-	public static class Builder extends FieldHandler.Builder {
+	public static class Builder extends SimpleFieldHandler.Builder {
 		
 		public PrimitiveFieldHandler handler;
 		
@@ -36,7 +35,7 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 		}
 		
 		@Override
-		public FieldHandler getHandler() {
+		public SimpleFieldHandler getHandler() {
 			return handler;
 		}
 	}
@@ -47,8 +46,8 @@ public abstract class PrimitiveFieldHandler extends FieldHandler {
 	 * @param name
 	 * @param field
 	 */
-	protected PrimitiveFieldHandler(String name, Field field) {
-		super(name, field);
+	protected PrimitiveFieldHandler(String name) {
+		super(name);
 	}
 
 

@@ -8,6 +8,7 @@ import com.s8.io.joos.JOOS_Type;
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.fields.FieldHandler;
+import com.s8.io.joos.fields.SimpleFieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ObjectScope;
 import com.s8.io.joos.parsing.ParsingScope;
@@ -23,19 +24,19 @@ import com.s8.io.joos.types.TypeHandler;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
-public class ObjectFieldHandler extends FieldHandler {
+public class ObjectFieldHandler extends SimpleFieldHandler {
 	
 	
-	public static class Builder extends FieldHandler.Builder  {
+	public static class Builder extends SimpleFieldHandler.Builder  {
 	
 		public Class<?> fieldType;
 		
 		public final ObjectFieldHandler handler;
 		
-		public Builder(String name, Field field) {
+		public Builder(String name, Class<?> fieldType) {
 			super();
-			handler = new ObjectFieldHandler(name, field);
-			this.fieldType = field.getType();
+			handler = new ObjectFieldHandler(name);
+			this.fieldType = fieldType;
 		}
 		
 
@@ -59,7 +60,7 @@ public class ObjectFieldHandler extends FieldHandler {
 
 
 		@Override
-		public FieldHandler getHandler() {
+		public SimpleFieldHandler getHandler() {
 			return handler;
 		}
 	}
@@ -71,8 +72,8 @@ public class ObjectFieldHandler extends FieldHandler {
 	 */
 	public TypeHandler fieldType;
 
-	private ObjectFieldHandler(String name, Field field) {
-		super(name, field);
+	private ObjectFieldHandler(String name) {
+		super(name);
 	}
 
 	public void set(Object object, Object child) throws IllegalArgumentException, IllegalAccessException {

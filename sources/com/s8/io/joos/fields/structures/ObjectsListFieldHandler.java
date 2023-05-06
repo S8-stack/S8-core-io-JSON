@@ -2,9 +2,7 @@ package com.s8.io.joos.fields.structures;
 
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,9 +10,9 @@ import com.s8.io.joos.JOOS_Lexicon;
 import com.s8.io.joos.JOOS_Type;
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
-import com.s8.io.joos.fields.FieldHandler;
-import com.s8.io.joos.parsing.JOOS_ParsingException;
+import com.s8.io.joos.fields.ListFieldHandler;
 import com.s8.io.joos.parsing.ArrayScope;
+import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ObjectScope;
 import com.s8.io.joos.parsing.ParsingScope;
 import com.s8.io.joos.types.JOOS_CompilingException;
@@ -28,16 +26,16 @@ import com.s8.io.joos.types.TypeHandler;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  * 
  */
-public class ObjectsListFieldHandler extends FieldHandler {
+public class ObjectsListFieldHandler extends ListFieldHandler {
 
 	
-	public static class Builder extends FieldHandler.Builder {
+	public static class Builder extends ListFieldHandler.Builder {
 		
 		
 		public ObjectsListFieldHandler handler;
 		
-		public Builder(String name, Field field) {
-			handler = new ObjectsListFieldHandler(name, field);
+		public Builder(String name, Class<?> componentType) {
+			handler = new ObjectsListFieldHandler(name, componentType);
 		}
 		
 
@@ -66,7 +64,7 @@ public class ObjectsListFieldHandler extends FieldHandler {
 		}
 		
 		@Override
-		public FieldHandler getHandler() {
+		public ListFieldHandler getHandler() {
 			return handler;
 		}
 	}
@@ -78,52 +76,36 @@ public class ObjectsListFieldHandler extends FieldHandler {
 	
 	public TypeHandler componentTypeHandler;
 
-	public ObjectsListFieldHandler(String name, Field field) {
-		super(name, field);
-
-		Type actualComponentType = ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-		
-		// if type is like: MySubObject<T>
-		if(actualComponentType instanceof ParameterizedType) {
-			componentType = (Class<?>) ((ParameterizedType) actualComponentType).getRawType();
-		}
-		// if type is simply like: MySubObject
-		else if(actualComponentType instanceof Class<?>){
-			componentType = (Class<?>) actualComponentType;
-		}
+	public ObjectsListFieldHandler(String name, Class<?> componentType) {
+		super(name);
+		this.componentType = componentType;
 	}
 
-	public void set(Object object, Object value) throws JOOS_ParsingException {
+	public void add(Object object, Object item) throws JOOS_ParsingException {
 		try {
-			field.set(object, value);
-		} catch (IllegalAccessException | IllegalArgumentException e) {
+			adder.invoke(object, item);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new JOOS_ParsingException("Cannot set Object array due to "+e.getMessage());
 		}
 	}
 
 
-	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
-		return field.get(object);
-	}
 
-
-
-	@SuppressWarnings("unchecked")
 	@Override
 	public boolean compose(Object object, ComposingScope scope)
 			throws IOException, JOOS_ComposingException {
 
 		// retrieve array
-		List<Object> list = null;
+		List<Object> list = new ArrayList<>();
 		try {
-			list = (List<Object>) field.get(object);
+			iterator.invoke(object, list);
 		} 
-		catch (IllegalArgumentException | IllegalAccessException e) {
+		catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			throw new JOOS_ComposingException(e.getMessage());
 		}
 
 
-		if(list!=null) {
+		if(list.size() > 0) {
 
 			// field description
 			scope.newItem();
@@ -155,21 +137,20 @@ public class ObjectsListFieldHandler extends FieldHandler {
 		
 		return new ArrayScope() {
 			
-			private List<Object> values = new ArrayList<>();
 			
 			@Override
 			public ParsingScope openItemScope() throws JOOS_ParsingException {
 				return new ObjectScope(componentTypeHandler) {
 					@Override
-					public void onParsed(Object object) throws JOOS_ParsingException {
-						values.add(object);
+					public void onParsed(Object item) throws JOOS_ParsingException {
+						add(object, item);
 					}
 				};
 			}
 			
 			@Override
 			public void close() throws JOOS_ParsingException {
-				ObjectsListFieldHandler.this.set(object, values);
+				// do nothing
 			}
 		};
 	}

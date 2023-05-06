@@ -10,11 +10,11 @@ import java.util.Queue;
 import com.s8.io.joos.composing.Composer;
 import com.s8.io.joos.composing.JOOS_ComposingException;
 import com.s8.io.joos.composing.JOOS_Writer;
-import com.s8.io.joos.fields.FieldHandlerFactory;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.JOOS_Reader;
 import com.s8.io.joos.parsing.Parser;
 import com.s8.io.joos.parsing.StreamReader;
+import com.s8.io.joos.types.FieldHandlerGenerator;
 import com.s8.io.joos.types.JOOS_CompilingException;
 import com.s8.io.joos.types.TypeHandler;
 
@@ -47,7 +47,7 @@ public class JOOS_Lexicon {
 	public class Builder {
 
 
-		private final FieldHandlerFactory fieldHandlerFactory;
+		private final FieldHandlerGenerator fieldHandlerFactory;
 
 		public Queue<Class<?>> buffer = new LinkedList<>();
 
@@ -55,7 +55,7 @@ public class JOOS_Lexicon {
 
 
 		public Builder() {
-			fieldHandlerFactory = new FieldHandlerFactory();
+			fieldHandlerFactory = new FieldHandlerGenerator();
 		}
 		
 		
@@ -125,7 +125,7 @@ public class JOOS_Lexicon {
 		}
 
 
-		public FieldHandlerFactory getFieldFactory() {
+		public FieldHandlerGenerator getFieldFactory() {
 			return fieldHandlerFactory;
 		}
 
