@@ -1,13 +1,12 @@
 package com.s8.io.joos.fields.objects;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import com.s8.io.joos.JOOS_Lexicon;
 import com.s8.io.joos.JOOS_Type;
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
-import com.s8.io.joos.fields.FieldHandler;
 import com.s8.io.joos.fields.SimpleFieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ObjectScope;
@@ -76,12 +75,29 @@ public class ObjectFieldHandler extends SimpleFieldHandler {
 		super(name);
 	}
 
-	public void set(Object object, Object child) throws IllegalArgumentException, IllegalAccessException {
-		field.set(object, child);
+	public void set(Object object, Object child) throws JOOS_ParsingException {
+		try {
+			setter.invoke(object, child);
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+			throw new JOOS_ParsingException(e.getMessage());
+		}
 	}
 
-	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
-		return field.get(object);
+	
+	/**
+	 * 
+	 * @param object
+	 * @return
+	 * @throws JOOS_ComposingException
+	 */
+	public Object get(Object object) throws JOOS_ComposingException {
+		try {
+			return getter.invoke(object, new Object[]{});
+		} catch (IllegalAccessException | InvocationTargetException e) {
+			e.printStackTrace();
+			throw new JOOS_ComposingException(e.getMessage());
+		}
 	}
 
 	
@@ -89,15 +105,8 @@ public class ObjectFieldHandler extends SimpleFieldHandler {
 	@Override
 	public boolean compose(Object object, ComposingScope scope) throws JOOS_ComposingException, IOException {
 
-		Object value = null;
-		try {
-			value = field.get(object);
-		} 
-		catch (IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
-			throw new JOOS_ComposingException(e.getMessage());
-		}
-
+		Object value = get(object);
+		
 		if(value!=null) {
 			// declare type
 			scope.newItem();
@@ -118,12 +127,7 @@ public class ObjectFieldHandler extends SimpleFieldHandler {
 	public ParsingScope openScope(Object parent) {
 		return new ObjectScope(fieldType) {
 			public @Override void onParsed(Object child) throws JOOS_ParsingException {
-				try {
-					ObjectFieldHandler.this.set(parent, child);
-				}
-				catch (IllegalArgumentException | IllegalAccessException e) {
-					throw new JOOS_ParsingException("Failed to set object due to "+e.getMessage());
-				}
+				ObjectFieldHandler.this.set(parent, child);
 			}
 		};
 	}

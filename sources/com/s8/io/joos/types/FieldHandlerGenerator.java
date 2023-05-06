@@ -3,42 +3,23 @@ package com.s8.io.joos.types;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import com.s8.io.joos.JOOS_Append;
-import com.s8.io.joos.JOOS_Field;
 import com.s8.io.joos.JOOS_Get;
-import com.s8.io.joos.JOOS_PrimitiveExtension;
+import com.s8.io.joos.JOOS_Iterate;
+import com.s8.io.joos.JOOS_Put;
 import com.s8.io.joos.JOOS_Set;
+import com.s8.io.joos.JOOS_Traverse;
 import com.s8.io.joos.fields.FieldHandler;
+import com.s8.io.joos.fields.FieldHandler.Kind;
+import com.s8.io.joos.fields.FieldHandlerFactory;
 import com.s8.io.joos.fields.ListFieldHandler;
 import com.s8.io.joos.fields.MapFieldHandler;
 import com.s8.io.joos.fields.SimpleFieldHandler;
-import com.s8.io.joos.fields.FieldHandler.Kind;
-import com.s8.io.joos.fields.FieldHandlerFactory;
 import com.s8.io.joos.fields.SimpleFieldHandler.Builder;
-import com.s8.io.joos.fields.arrays.BooleanArrayFieldHandler;
-import com.s8.io.joos.fields.arrays.DoubleArrayFieldHandler;
-import com.s8.io.joos.fields.arrays.DoubleListFieldHandler;
-import com.s8.io.joos.fields.arrays.FloatArrayFieldHandler;
-import com.s8.io.joos.fields.arrays.IntegerArrayFieldHandler;
-import com.s8.io.joos.fields.arrays.LongArrayFieldHandler;
-import com.s8.io.joos.fields.arrays.ShortArrayFieldHandler;
-import com.s8.io.joos.fields.arrays.StringArrayFieldHandler;
-import com.s8.io.joos.fields.objects.ObjectFieldHandler;
-import com.s8.io.joos.fields.objects.ObjectsArrayFieldHandler;
-import com.s8.io.joos.fields.primitives.BooleanFieldHandler;
-import com.s8.io.joos.fields.primitives.DoubleFieldHandler;
-import com.s8.io.joos.fields.primitives.EnumFieldHandler;
-import com.s8.io.joos.fields.primitives.FloatFieldHandler;
-import com.s8.io.joos.fields.primitives.IntegerFieldHandler;
-import com.s8.io.joos.fields.primitives.LongFieldHandler;
-import com.s8.io.joos.fields.primitives.ShortFieldHandler;
-import com.s8.io.joos.fields.primitives.StringFieldHandler;
-import com.s8.io.joos.fields.structures.ObjectsListFieldHandler;
-import com.s8.io.joos.fields.structures.ObjectsMapFieldHandler;
 import com.s8.io.joos.parsing.JOOS_ParsingException;
 
 
@@ -53,17 +34,10 @@ public class FieldHandlerGenerator {
 
 
 
-	private final List<JOOS_PrimitiveExtension<?>> extensions;
 
 	public FieldHandlerGenerator() {
 		super();
-		extensions = new ArrayList<JOOS_PrimitiveExtension<?>>();
 	}
-
-	public <T> void add(JOOS_PrimitiveExtension<T> extension) {
-		extensions.add(extension);
-	}
-
 
 
 
@@ -76,7 +50,7 @@ public class FieldHandlerGenerator {
 	 * @throws JOOS_ParsingException 
 	 * @throws Exception
 	 */
-	public FieldHandler.Builder create(Method method, Map<String, FieldHandler.Builder> fieldBuilders) throws JOOS_CompilingException {
+	public void appendMethod(Method method, Map<String, FieldHandler.Builder> fieldBuilders) throws JOOS_CompilingException {
 
 		if(method.isAnnotationPresent(JOOS_Set.class)) {
 			create_Set(method, fieldBuilders);
@@ -84,13 +58,19 @@ public class FieldHandlerGenerator {
 		else if(method.isAnnotationPresent(JOOS_Get.class)) {
 			create_Get(method, fieldBuilders);
 		}
-		if(method.isAnnotationPresent(JOOS_Append.class)) {
+		else if(method.isAnnotationPresent(JOOS_Append.class)) {
 			create_Append(method, fieldBuilders);
 		}
-		else if(method.isAnnotationPresent(JOOS_Get.class)) {
-			create_Get(method, fieldBuilders);
+		else if(method.isAnnotationPresent(JOOS_Iterate.class)) {
+			create_Iterate(method, fieldBuilders);
 		}
-		
+		else if(method.isAnnotationPresent(JOOS_Put.class)) {
+			create_Put(method, fieldBuilders);
+		}
+		else if(method.isAnnotationPresent(JOOS_Traverse.class)) {
+			create_Traverse(method, fieldBuilders);
+		}
+		// else -> skip
 	}
 
 	/**
@@ -194,21 +174,21 @@ public class FieldHandlerGenerator {
 
 		FieldHandler.Builder fieldBuilder = fieldBuilders.get(name);
 
-		SimpleFieldHandler.Builder simpleFieldBuilder = null;
+		ListFieldHandler.Builder listFieldBuilder = null;
 
 		if(fieldBuilder == null) {
-			simpleFieldBuilder = FieldHandlerFactory.createSimpleFieldBuilder(fieldType, name);
-			fieldBuilders.put(name, simpleFieldBuilder);
+			listFieldBuilder = FieldHandlerFactory.createListFieldBuilder(fieldType, name);
+			fieldBuilders.put(name, listFieldBuilder);
 		}
 		else {
 			if(fieldBuilder.getHandler().advertise() != Kind.SIMPLE) {
 				throw new JOOS_CompilingException(method.getDeclaringClass(), 
 						method.getName()+": field is already defined with this name and different type");
 			}
-			simpleFieldBuilder = (Builder) fieldBuilder;
+			listFieldBuilder = (ListFieldHandler.Builder) fieldBuilder;
 		}
 
-		simpleFieldBuilder.setSetter(method);
+		listFieldBuilder.setAdder(method);
 
 	}
 	
@@ -226,32 +206,37 @@ public class FieldHandlerGenerator {
 			throw new JOOS_CompilingException(method.getDeclaringClass(), 
 					method.getName()+": Iterate must have only one parameter");
 		}
+		
+		Class<?> paramConsumerType = method.getParameters()[0].getType();
+		if(!Consumer.class.isAssignableFrom(paramConsumerType)) {
+			throw new JOOS_CompilingException(method.getDeclaringClass(), 
+					method.getName()+": Must be a consumer");	
+		}
 
-		
-		
-		Class<?> paramType = method.getParameters()[0].getType();
+		Type actualComponentType = ((ParameterizedType) method.getGenericParameterTypes()[0]).getActualTypeArguments()[0];
+		Class<?> componentType = (Class<?>) actualComponentType;
 
 		JOOS_Set annotation = method.getAnnotation(JOOS_Set.class);
 		String name = annotation.name();
 
 		FieldHandler.Builder fieldBuilder = fieldBuilders.get(name);
 
-		SimpleFieldHandler.Builder simpleFieldBuilder = null;
+		ListFieldHandler.Builder listFieldBuilder = null;
 
 		if(fieldBuilder == null) {
-			simpleFieldBuilder = FieldHandlerFactory.createSimpleFieldBuilder(fieldType, name);
-			fieldBuilders.put(name, simpleFieldBuilder);
+			listFieldBuilder = FieldHandlerFactory.createListFieldBuilder(componentType, name);
+			fieldBuilders.put(name, listFieldBuilder);
 		}
 		else {
-			if(fieldBuilder.getHandler().advertise() != Kind.SIMPLE) {
+			if(fieldBuilder.getHandler().advertise() != Kind.LIST) {
 				throw new JOOS_CompilingException(method.getDeclaringClass(), 
 						method.getName()+": field is already defined with this name and different type");
 			}
-			simpleFieldBuilder = (Builder) fieldBuilder;
+			listFieldBuilder = (ListFieldHandler.Builder) fieldBuilder;
 		}
 
-		simpleFieldBuilder.setSetter(method);
-
+		/* set method */
+		listFieldBuilder.setIterator(method);
 	}
 
 
@@ -294,126 +279,56 @@ public class FieldHandlerGenerator {
 	}
 	
 	
+	
+
+
+	/**
+	 * 
+	 * @param method
+	 * @param fieldBuilders
+	 * @throws JOOS_CompilingException 
+	 */
 	private void create_Traverse(Method method, Map<String, FieldHandler.Builder> fieldBuilders) throws JOOS_CompilingException {
 
 		/* check params count */
-		if(method.getParameterCount() != 2){
+		if(method.getParameterCount() != 1){
 			throw new JOOS_CompilingException(method.getDeclaringClass(), 
-					method.getName()+": Put metghod must have exactly two parameters");
+					method.getName()+": Iterate must have only one parameter");
+		}
+		
+		Class<?> paramConsumerType = method.getParameters()[0].getType();
+		if(!BiConsumer.class.isAssignableFrom(paramConsumerType)) {
+			throw new JOOS_CompilingException(method.getDeclaringClass(), 
+					method.getName()+": Must be a consumer");	
 		}
 
-		if(method.getParameters()[0].getType() != String.class){
+		Type[] actualComponentTypes = ((ParameterizedType) method.getGenericParameterTypes()[0]).getActualTypeArguments();
+		if(!actualComponentTypes[0].equals(String.class)) {
 			throw new JOOS_CompilingException(method.getDeclaringClass(), 
-					method.getName()+": first parameter must be a String key");
+					method.getName()+": Key must be string");
 		}
-
-		Class<?> fieldType = method.getParameters()[1].getType();
+		Class<?> componentType = (Class<?>) actualComponentTypes[1];
 
 		JOOS_Set annotation = method.getAnnotation(JOOS_Set.class);
 		String name = annotation.name();
 
 		FieldHandler.Builder fieldBuilder = fieldBuilders.get(name);
 
-		MapFieldHandler.Builder mapFieldBuilder = null;
+		ListFieldHandler.Builder listFieldBuilder = null;
 
 		if(fieldBuilder == null) {
-			mapFieldBuilder = createMapFieldBuilder(fieldType, name);
-			fieldBuilders.put(name, mapFieldBuilder);
+			listFieldBuilder = FieldHandlerFactory.createListFieldBuilder(componentType, name);
+			fieldBuilders.put(name, listFieldBuilder);
 		}
 		else {
-			if(fieldBuilder.getHandler().advertise() != Kind.MAP) {
+			if(fieldBuilder.getHandler().advertise() != Kind.LIST) {
 				throw new JOOS_CompilingException(method.getDeclaringClass(), 
 						method.getName()+": field is already defined with this name and different type");
 			}
-			mapFieldBuilder = (MapFieldHandler.Builder) fieldBuilder;
+			listFieldBuilder = (ListFieldHandler.Builder) fieldBuilder;
 		}
 
-		mapFieldBuilder.setPutter(method);
-	}
-
-
-	private SimpleFieldHandler.Builder createSimpleFieldBuilder(Class<?> fieldType, String name) {
-		// primitive
-		if(fieldType.isPrimitive()){
-			if(fieldType == boolean.class){
-				return new BooleanFieldHandler.Builder(name);
-			}
-			else if(fieldType == short.class){
-				return new ShortFieldHandler.Builder(name);
-			}
-			else if(fieldType == int.class){
-				return new IntegerFieldHandler.Builder(name);
-			}
-			else if(fieldType == long.class){
-				return new LongFieldHandler.Builder(name);
-			}
-			else if(fieldType == float.class){
-				return new FloatFieldHandler.Builder(name);
-			}
-			else if(fieldType == double.class){
-				return new DoubleFieldHandler.Builder(name);
-			}
-			else{
-				throw new RuntimeException("Primitive type not supported "+fieldType.getName());
-			}
-		}
-		// primitive
-		else if(fieldType == String.class){
-			return new StringFieldHandler.Builder(name);
-		}
-		// enum
-		else if(fieldType.isEnum()){
-			return new EnumFieldHandler.Builder(name, fieldType);
-		}
-		else{
-			return new ObjectFieldHandler.Builder(name, fieldType);	
-		}
-	}
-
-
-
-	private ListFieldHandler.Builder createListFieldBuilder(Class<?> fieldType, String name) {
-		// primitive
-		if(fieldType.isPrimitive()){
-			if(fieldType == boolean.class){
-				return new BooleanArrayFieldHandler.Builder(name);
-			}
-			else if(fieldType == short.class){
-				return new ShortArrayFieldHandler.Builder(name);
-			}
-			else if(fieldType == int.class){
-				return new IntegerArrayFieldHandler.Builder(name);
-			}
-			else if(fieldType == long.class){
-				return new LongArrayFieldHandler.Builder(name);
-			}
-			else if(fieldType == float.class){
-				return new FloatArrayFieldHandler.Builder(name);
-			}
-			else if(fieldType == double.class){
-				return new DoubleListFieldHandler.Builder(name);
-			}
-			else{
-				throw new RuntimeException("Primitive type not supported "+fieldType.getName());
-			}
-		}
-		// primitive
-		else if(fieldType == String.class){
-			return new StringArrayFieldHandler.Builder(name);
-		}
-		else{
-			return new ObjectsListFieldHandler.Builder(name, fieldType);	
-		}
-	}
-
-
-	private MapFieldHandler.Builder createMapFieldBuilder(Class<?> fieldType, String name) throws JOOS_CompilingException {
-		// primitive
-		if(fieldType.isPrimitive()){
-			throw new RuntimeException("Primitive type not supported "+fieldType.getName());
-		}
-		else{
-			return new ObjectsMapFieldHandler.Builder(name, fieldType);	
-		}
+		/* set method */
+		listFieldBuilder.setIterator(method);
 	}
 }

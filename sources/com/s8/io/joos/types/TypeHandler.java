@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.s8.io.joos.JOOS_Field;
 import com.s8.io.joos.JOOS_Lexicon;
 import com.s8.io.joos.JOOS_Type;
 import com.s8.io.joos.composing.ComposingScope;
@@ -30,7 +29,7 @@ public class TypeHandler {
 
 
 		private JOOS_Type typeAnnotation;
-		
+
 		Class<?>[] subTypes;
 
 		private Map<String, FieldHandler.Builder> fieldBuilders;
@@ -44,12 +43,12 @@ public class TypeHandler {
 			if(typeAnnotation==null){
 				throw new RuntimeException("Missing annotation in type: "+type.getName());
 			}
-			
+
 			subTypes = typeAnnotation.sub();
 		}
 
 
-		public void build(FieldHandlerGenerator factory) throws JOOS_CompilingException {
+		public void build(FieldHandlerGenerator generator) throws JOOS_CompilingException {
 
 			name = typeAnnotation.name();
 
@@ -74,30 +73,13 @@ public class TypeHandler {
 
 			/* <fields> */
 
-			FieldHandler.Builder fieldBuilder;
-			JOOS_Field fieldAnnotation;
-
 			fieldBuilders = new HashMap<>();
 
 			// for each method
 			for(Method method : type.getMethods()){
 
-				// look for input (setter)
-				fieldAnnotation = field.getAnnotation(JOOS_Field.class);
-				if(fieldAnnotation!=null){
-
-					// check if already existing
-					if(fieldHandlers.get(fieldAnnotation.name())!=null){
-						throw new RuntimeException("A field is already defined with name: "+fieldAnnotation.name());
-					}
-
-					// create field handler
-					fieldBuilder = factory.create(method, fieldBuilders);
-
-					
-
-					fieldHandlers.put(fieldAnnotation.name(), fieldBuilder.getHandler());
-				}
+				// create field handler
+				generator.appendMethod(method, fieldBuilders);
 			}
 		}
 
@@ -114,7 +96,7 @@ public class TypeHandler {
 			}
 
 			// sub-discover by fields
-			for(FieldHandler.Builder fieldBuilder : fieldBuilders) {
+			for(FieldHandler.Builder fieldBuilder : fieldBuilders.values()) {
 				fieldBuilder.subDiscover(lexiconBuilder);
 			}
 		}
@@ -125,14 +107,19 @@ public class TypeHandler {
 		 * @param builder
 		 */
 		public void compile(JOOS_Lexicon.Builder lexiconBuilder) {
-			
+
 			if(subTypes!=null){
 				for(Class<?> subType : subTypes){ 
 					subTypeHandlers.add(lexiconBuilder.getByClassName(subType)); 
 				}
 			}
-			
-			fieldBuilders.forEach(fieldBuilder -> fieldBuilder.compile(lexiconBuilder));
+
+			fieldHandlers = new HashMap<String, FieldHandler>();
+
+			fieldBuilders.forEach((name, fieldBuilder) -> {
+				fieldBuilder.compile(lexiconBuilder);
+				fieldHandlers.put(name, fieldBuilder.getHandler());
+			});
 		}
 
 
@@ -164,7 +151,7 @@ public class TypeHandler {
 	/**
 	 * field handlers
 	 */
-	public Map<String, FieldHandler> fieldHandlers = new HashMap<String, FieldHandler>();
+	public Map<String, FieldHandler> fieldHandlers;
 
 
 

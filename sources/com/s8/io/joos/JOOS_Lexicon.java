@@ -115,16 +115,6 @@ public class JOOS_Lexicon {
 
 
 
-
-		/**
-		 * 
-		 * @param extension
-		 */
-		public <T> void definePrimitiveExtension(JOOS_PrimitiveExtension<T> extension) {
-			fieldHandlerFactory.add(extension);
-		}
-
-
 		public FieldHandlerGenerator getFieldFactory() {
 			return fieldHandlerFactory;
 		}

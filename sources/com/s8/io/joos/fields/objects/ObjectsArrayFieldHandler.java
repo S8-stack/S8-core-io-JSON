@@ -2,18 +2,18 @@ package com.s8.io.joos.fields.objects;
 
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import com.s8.io.joos.JOOS_Lexicon;
 import com.s8.io.joos.JOOS_Type;
 import com.s8.io.joos.composing.ComposingScope;
 import com.s8.io.joos.composing.JOOS_ComposingException;
-import com.s8.io.joos.fields.FieldHandler;
-import com.s8.io.joos.parsing.JOOS_ParsingException;
+import com.s8.io.joos.fields.ListFieldHandler;
 import com.s8.io.joos.parsing.ArrayScope;
+import com.s8.io.joos.parsing.JOOS_ParsingException;
 import com.s8.io.joos.parsing.ObjectScope;
 import com.s8.io.joos.parsing.ParsingScope;
 import com.s8.io.joos.types.JOOS_CompilingException;
@@ -28,15 +28,15 @@ import com.s8.io.joos.types.TypeHandler;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
-public class ObjectsArrayFieldHandler extends FieldHandler {
+public class ObjectsArrayFieldHandler extends ListFieldHandler {
 	
-	public static class Builder extends FieldHandler.Builder {
+	public static class Builder extends ListFieldHandler.Builder {
 		
 		public ObjectsArrayFieldHandler handler;
 		
-		public Builder(String name, Field field) {
+		public Builder(String name, Class<?> componentType) {
 			super();
-			this.handler = new ObjectsArrayFieldHandler(name, field);
+			this.handler = new ObjectsArrayFieldHandler(name, componentType);
 		}
 		
 		@Override
@@ -62,7 +62,7 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 		}
 		
 		@Override
-		public FieldHandler getHandler() {
+		public ListFieldHandler getHandler() {
 			return handler;
 		}
 	}
@@ -73,23 +73,19 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 	public TypeHandler componentTypeHandler;
 
 
-	public ObjectsArrayFieldHandler(String name, Field field) {
-		super(name, field);
-		this.componentType = field.getType().getComponentType();
+	public ObjectsArrayFieldHandler(String name, Class<?> componentType) {
+		super(name);
+		this.componentType = componentType;
 	}
 
-	public void set(Object object, Object valuesArray) throws JOOS_ParsingException {
+	public void add(Object object, Object item) throws JOOS_ParsingException {
 		try {
-			field.set(object, valuesArray);
-		} catch (IllegalAccessException | IllegalArgumentException e) {
+			adder.invoke(object, item);
+		} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new JOOS_ParsingException("Cannot set Object array due to "+e.getMessage());
 		}
 	}
 
-
-	public Object get(Object object) throws IllegalArgumentException, IllegalAccessException {
-		return field.get(object);
-	}
 
 
 	
@@ -98,30 +94,36 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 	public boolean compose(Object object, ComposingScope scope) throws IOException, JOOS_ComposingException {
 
 		// retrieve array
-		Object array;
-		try {
-			array = field.get(object);
+		List<Object> list = new ArrayList<>();
+		Consumer<Object> consumer = new Consumer<Object>() {
+			@Override
+			public void accept(Object t) {
+				list.add(t);
+			}
+		};
+ 		try {
+			iterator.invoke(object, consumer);
 		} 
-		catch (IllegalArgumentException | IllegalAccessException e) {
+		catch (IllegalArgumentException | IllegalAccessException | InvocationTargetException e) {
 			e.printStackTrace();
 			throw new JOOS_ComposingException(e.getMessage());
 		}
 		
-		if(array!=null) {
+		if(list.size() > 0) {
 
 			// field description
 			scope.newItem();
 			scope.append(name);
 			scope.append(':');
 			
-			int length = Array.getLength(array);
+			int length = list.size();
 
 			ComposingScope enclosedScope = scope.enterSubscope('[', ']', true);
 			
 			enclosedScope.open();
 			Object item;
 			for(int index=0; index<length; index++) {
-				item = Array.get(array, index);
+				item = list.get(index);
 				if(item!=null) {
 					
 					enclosedScope.newItem();
@@ -143,26 +145,20 @@ public class ObjectsArrayFieldHandler extends FieldHandler {
 		
 		return new ArrayScope() {
 			
-			private List<Object> values = new ArrayList<>();
 			
 			@Override
 			public ParsingScope openItemScope() throws JOOS_ParsingException {
 				return new ObjectScope(componentTypeHandler) {
 					@Override
-					public void onParsed(Object object) throws JOOS_ParsingException {
-						values.add(object);
+					public void onParsed(Object item) throws JOOS_ParsingException {
+						add(object, item);
 					}
 				};
 			}
 			
 			@Override
 			public void close() throws JOOS_ParsingException {
-				int length = values.size();
-				Object array = Array.newInstance(componentType, length);
-				for(int index=0; index<length; index++) {
-					Array.set(array, index, values.get(index));
-				}
-				ObjectsArrayFieldHandler.this.set(object, array);
+				// nothing to do here
 			}
 		};
 	}
