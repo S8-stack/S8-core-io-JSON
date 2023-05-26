@@ -1,4 +1,4 @@
-package com.s8.blocks.joos.tests.repo00;
+package com.s8.blocks.joos.demos.repo00;
 
 import java.util.List;
 import java.util.Map;

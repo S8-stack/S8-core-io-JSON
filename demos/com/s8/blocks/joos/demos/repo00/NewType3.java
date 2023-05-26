@@ -1,4 +1,4 @@
-package com.s8.blocks.joos.tests.repo00;
+package com.s8.blocks.joos.demos.repo00;
 
 import com.s8.io.joos.JOOS_Field;
 import com.s8.io.joos.JOOS_Type;
