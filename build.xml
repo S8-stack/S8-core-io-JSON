@@ -2,9 +2,10 @@
 <project name="MyProject" basedir="." default="package-jar">
 
 	<property name="module" value="com.s8.io.joos" />
+	<property name="name" value="s8-io-joos" />
 	<property name="stack" value="/Users/pc/qx/git/com.s8.stack/modules" />
 	<property name="stack-sources" value="/Users/pc/qx/git/com.s8.stack/mod-sources" />
-	<property name="jar-name" value="${stack}/s8-io-joos" />
+	<property name="jar-name" value="${stack}/${name}.jar" />
 	<property name="d0" value="../com.s8.io.xml/s8-io-xml.jar" />
 	<property name="d1" value="../com.s8.io.bytes/s8-io-bytes.jar" />
 	<property name="d2" value="../com.s8.io.bohr.atom/s8-io-bohr-atom.jar" />
@@ -59,7 +60,7 @@
 	<target name="package-jar" depends="compile">
 		<exec executable="${javahome}/bin/jar" dir="${basedir}">
 			<arg value="-c" />
-			<arg value="--file=${jar-name}.jar" />
+			<arg value="--file=${jar-name}" />
 			<arg value="-C" />
 			<arg value="forge/classes/${module}" />
 			<arg value="." />
