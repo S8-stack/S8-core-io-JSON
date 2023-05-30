@@ -1,6 +1,6 @@
 package com.s8.io.joos.composing;
 
-
+import java.io.IOException;
 
 /**
  * 
@@ -10,7 +10,7 @@ package com.s8.io.joos.composing;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
-public class JOOS_ComposingException extends Exception {
+public class JOOS_ComposingException extends IOException {
 
 	/**
 	 * 

@@ -1,6 +1,6 @@
 package com.s8.io.joos.parsing;
 
-
+import java.io.IOException;
 
 /**
  * 
@@ -10,7 +10,7 @@ package com.s8.io.joos.parsing;
  * Copyright (C) 2022, Pierre Convert. All rights reserved.
  *
  */
-public class JOOS_ParsingException extends Exception {
+public class JOOS_ParsingException extends IOException {
 
 	/**
 	 * 
