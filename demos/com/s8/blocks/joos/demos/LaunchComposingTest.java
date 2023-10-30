@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import com.s8.blocks.joos.demos.repo00.MyRootType;
 import com.s8.blocks.joos.demos.repo00.NewType2;
 import com.s8.blocks.joos.demos.repo00.NewType3;
-import com.s8.io.joos.JOOS_Lexicon;
-import com.s8.io.joos.composing.JOOS_ComposingException;
-import com.s8.io.joos.types.JOOS_CompilingException;
-import com.s8.io.joos.utilities.JOOS_BufferedFileWriter;
+import com.s8.core.io.joos.JOOS_Lexicon;
+import com.s8.core.io.joos.composing.JOOS_ComposingException;
+import com.s8.core.io.joos.types.JOOS_CompilingException;
+import com.s8.core.io.joos.utilities.JOOS_BufferedFileWriter;
 
 
 public class LaunchComposingTest {
