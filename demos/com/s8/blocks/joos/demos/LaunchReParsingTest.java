@@ -18,7 +18,7 @@ public class LaunchReParsingTest {
 		JOOS_Lexicon context = JOOS_Lexicon.from(MyRootType.class);
 		
 		
-		String pathname = "data/V2_test_output.joos";
+		String pathname = "data/V2_test_output.js";
 
 		
 		RandomAccessFile file = new RandomAccessFile(new File(pathname), "r");
