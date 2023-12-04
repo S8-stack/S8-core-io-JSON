@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 import com.s8.core.io.joos.composing.ComposingScope;
 import com.s8.core.io.joos.composing.JOOS_ComposingException;
 import com.s8.core.io.joos.fields.PrimitiveFieldHandler;
-import com.s8.core.io.joos.parsing.AlphaNumericScope;
+import com.s8.core.io.joos.parsing.StringScope;
 import com.s8.core.io.joos.parsing.JOOS_ParsingException;
 import com.s8.core.io.joos.parsing.ParsingScope;
 
@@ -45,7 +45,7 @@ public abstract class JOOS_PrimitiveExtension<T> {
 
 		@Override
 		public ParsingScope openScope(Object object) {
-			return new AlphaNumericScope() {
+			return new StringScope() {
 				
 				@Override
 				public void setValue(String value) throws JOOS_ParsingException {

@@ -2,6 +2,8 @@ package com.s8.core.io.joos.parsing;
 
 import java.io.IOException;
 
+import com.s8.core.io.joos.types.TypeHandler;
+
 
 /**
  * 
@@ -15,16 +17,26 @@ import java.io.IOException;
  *
  */
 public class RootScope extends ParsingScope {
+	
+	public enum Style {
+		JSON,
+		JS;
+	}
 
 	public Object result;
+	
+	private TypeHandler rootTypeHandlerHint;
+	
+	private Style style;
 
-	public RootScope() {
+	public RootScope(TypeHandler typeHandler) {
 		super();
-		state = new Opening2();
+		state = new ConsumeOpening();
+		this.rootTypeHandlerHint = typeHandler;
 	}
 	
 	
-	private class Opening2 extends ParsingState {
+	private class ConsumeOpening extends ParsingState {
 
 		@Override
 		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
@@ -34,18 +46,22 @@ public class RootScope extends ParsingScope {
 			reader.skip('\n', '\t', ' ');
 
 
-			reader.checkSequence("const ");
-			reader.skip('\n', '\t', ' ');
-			reader.checkSequence("ROOT");
-			reader.skip('\n', '\t', ' ');
-			reader.checkSequence("=");
+			if(reader.is('{')) {
+				style = Style.JSON;
+			}
+			else {
+				style = Style.JS;
+				reader.checkSequence("const ");
+				reader.skip('\n', '\t', ' ');
+				reader.checkSequence("ROOT");
+				reader.skip('\n', '\t', ' ');
+				reader.checkSequence("=");
 
-			reader.moveNext();
+				reader.moveNext();
+			}
 			
 			
-			state = new Closing();
-			
-			parser.pushScope(new ObjectScope(null) {
+			parser.pushScope(new ObjectScope(rootTypeHandlerHint) {
 				
 				@Override
 				public void onParsed(Object object) throws JOOS_ParsingException {
@@ -53,6 +69,7 @@ public class RootScope extends ParsingScope {
 				}
 			});
 			
+			state = new Closing();
 			return false;
 		}
 		
@@ -69,8 +86,9 @@ public class RootScope extends ParsingScope {
 			// skip leading white spaces
 			reader.skip('\n', '\t', ' ');
 
-
-			reader.check(';');
+			if(style == Style.JS) {
+				reader.check(';');
+			}
 		
 			parser.popScope();
 			

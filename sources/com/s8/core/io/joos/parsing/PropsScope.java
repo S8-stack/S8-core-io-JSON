@@ -20,67 +20,71 @@ public abstract class PropsScope extends ParsingScope {
 
 
 	public abstract ParsingScope openProperty(String declarator) throws JOOS_ParsingException;
-	
+
 
 	public PropsScope() {
 		super();
-		state = new ReadEntry(true);
+		state = new ConsumeOpening();
 	}
 
 
-	public class ReadEntry extends ParsingState {
 
-		private boolean isFirst;
+	public class ConsumeOpening extends ParsingState {
 
-		public ReadEntry(boolean isFirst) {
+
+		public ConsumeOpening() {
 			super();
-			this.isFirst = isFirst;
 		}
 
 		@Override
 		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
 				throws JOOS_ParsingException, IOException {
-			
-			if(isFirst) {
-				// skip any leading chars
-				reader.skip('\n', '\t', ' ');
-				
-				/* previous state reading stopped on '{' (first item) or ',' (next items) */ 
-				reader.check('{');
-				
-				reader.moveToNextSymbol();
-			}
-			else {
-				reader.skip('\n', '\t', ' ');
-				if(reader.is(',')) { 
-					reader.moveToNextSymbol();
-				}
-			}
-			
-			if(reader.isAlphanumeric()){
-				String declarator = reader.readAlphanumericChain();
-				
-				reader.skip('\n', '\t', ' ');
-				reader.check(':');
-				reader.moveNext();
-				
-				/* dive into sub-scope */
-				parser.pushScope(openProperty(declarator));
 
-				/* setup state as read next entry for next time calling parse on this scope*/
-				if(isFirst) {
-					state = new ReadEntry(false);	
-				}
 
-				/* stop reading*/
-				return false;
-				
+			// skip any leading chars
+			reader.skip('\n', '\t', ' ');
+
+			/* previous state reading stopped on '{' (first item) or ',' (next items) */ 
+			reader.check('{');
+
+			/* consume */
+			reader.moveNext();
+
+			state = new ReadKey();
+
+			return true;
+		}
+	}
+
+
+
+
+	public class ReadKey extends ParsingState {
+
+
+		public ReadKey() {
+			super();
+		}
+
+		@Override
+		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
+				throws JOOS_ParsingException, IOException {
+
+
+			reader.skip('\n', '\t', ' ');
+
+			String declarator = null;
+			if(reader.is('"')) {
+				declarator = reader.readQuotedChain();
+			}
+			else if(reader.isAlphanumeric()){
+				declarator = reader.readAlphanumericChain();
 			}
 			else if(reader.is('}')){
-				
+
 				/* consumed scope closing char */
 				reader.moveNext();
-				
+
 				onExhausted();
 
 				/* remove current scope from stack */
@@ -90,13 +94,59 @@ public abstract class PropsScope extends ParsingScope {
 				return false;
 			}
 			else {
-				throw new JOOS_ParsingException(reader.line, reader.column, "Unexpected char: "+reader.getCurrentChar());
+				throw new JOOS_ParsingException("Expect alphanumeric or quoted chain here");
 			}
+
+
+			reader.skip('\n', '\t', ' ');
+
+			/* declarator mark mandatory at this point */
+			reader.check(':');
+
+			/* consume */
+			reader.moveNext();
+
+			/* dive into sub-scope */
+			parser.pushScope(openProperty(declarator));
+
+			/* setup state as read next entry for next time calling parse on this scope*/
+			state = new ReadSeparator();	
+
+			/* stop reading*/
+			return false;
+
 		}
 	}
-	
-	
-	
+
+
+
+	public class ReadSeparator extends ParsingState {
+
+		public ReadSeparator() {
+			super();
+		}
+
+		@Override
+		public boolean parse(Parser parser, StreamReader reader, boolean isVerbose)
+				throws JOOS_ParsingException, IOException {
+
+			// 
+			reader.skip('\n', '\t', ' ');
+
+			if(reader.is(',')) { 
+				reader.moveToNextSymbol();
+			}
+
+			state = new ReadKey();
+
+			return true;
+		}
+	}
+
+
+
+
+
 	public abstract void onExhausted() throws JOOS_ParsingException;
 
 }

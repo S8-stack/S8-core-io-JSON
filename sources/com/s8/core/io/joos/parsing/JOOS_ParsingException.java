@@ -65,7 +65,7 @@ public class JOOS_ParsingException extends IOException {
 	}
 
 	private static String message(char c, int line, int column) {
-		return "Parsing failed on line:"+line+" ,column:"+column+" , while reading char: >"+c; 
+		return "Parsing failed on line:"+line+" ,column:"+column+" , while reading char: >"+c+"(code = "+((int) c)+")"; 
 	}
 	
 	private static String message(int line, int column) {

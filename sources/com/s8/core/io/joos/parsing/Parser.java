@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Stack;
 
 import com.s8.core.io.joos.JOOS_Lexicon;
+import com.s8.core.io.joos.types.TypeHandler;
 
 
 /**
@@ -61,14 +62,19 @@ public class Parser {
 	 * @throws IOException 
 	 * @throws Exception
 	 */
-	public Object parse() throws JOOS_ParsingException, IOException {
+	public Object parse(Class<?> rootClassHint) throws JOOS_ParsingException, IOException {
 		
 		// initialize reader
 		reader.moveNext();
 		
 		scopes = new Stack<>();
 		
-		RootScope rootHandle = new RootScope();
+		TypeHandler typeHandler = null;
+		if(rootClassHint != null) {
+			typeHandler = context.get(rootClassHint);
+		}
+		
+		RootScope rootHandle = new RootScope(typeHandler);
 		scopes.push(rootHandle);
 		
 		ParsingScope scope;

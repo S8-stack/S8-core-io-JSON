@@ -16,6 +16,12 @@ public class StreamReader {
 	public static final boolean IS_DEBUG_ENABLED = true;
 
 	private static final int TAB_LENGTH = 3;
+	
+	
+	/**
+	 * Quoted length must not exceed this length
+	 */
+	public final static int MAX_QUOTED_LENGTH = 8192;
 
 	private JOOS_Reader reader;
 
@@ -53,7 +59,7 @@ public class StreamReader {
 	 * @throws Exception
 	 */
 	public void check(char c) throws JOOS_ParsingException {
-		if(this.c!=c){
+		if(this.c != c){
 			throw new JOOS_ParsingException((char) this.c, line, column,
 					"Expected char was: "+c);
 		}
@@ -105,9 +111,16 @@ public class StreamReader {
 			while(!isNext) {
 
 				/* update position before consuming current char */
-				if(c == '\n') { line++; }
-				if(c == '\t') { column+= TAB_LENGTH; }
-				else { column++; }
+				if(c == '\n') { 
+					line++; 
+					column = 0;
+				}
+				else if(c == '\t') { 
+					column+= TAB_LENGTH; 
+				}
+				else { 
+					column++; 
+				}
 
 				/* read next char */
 				c = reader.read();
@@ -153,6 +166,8 @@ public class StreamReader {
 			moveNext();
 		}
 	}
+	
+	
 
 
 
@@ -174,6 +189,32 @@ public class StreamReader {
 			builder.append((char) c);
 			moveNext();
 		}
+		return builder.toString();
+	}
+	
+	
+	/**
+	 * Started on opening quote mark
+	 * @return
+	 * @throws JOOS_ParsingException
+	 * @throws IOException
+	 */
+	public String readQuotedChain() throws JOOS_ParsingException, IOException {
+		
+		/* consume opening quote mark */
+		moveNext();
+	
+		StringBuilder builder = new StringBuilder();
+		int count = 0, maxLength = MAX_QUOTED_LENGTH;
+		while(c != '"' && count++ < maxLength) {
+			builder.append((char) c);
+			moveNext();
+		}
+
+		/* consume closing quote mark */
+		moveNext();
+		
+		if(count == maxLength) { throw new IOException("Chain exceed quoted length"); }
 		return builder.toString();
 	}
 

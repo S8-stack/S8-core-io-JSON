@@ -186,6 +186,21 @@ public class JOOS_Lexicon {
 	}
 
 
+	
+	
+	/**
+	 * 
+	 * @param reader
+	 * @param isVerbose
+	 * @return
+	 * @throws JOOS_ParsingException
+	 * @throws IOException
+	 */
+	public Object parse(JOOS_Reader reader, Class<?> rootType, boolean isVerbose) throws JOOS_ParsingException, IOException {
+		Parser parser = new Parser(this, new StreamReader(reader), isVerbose);
+		return parser.parse(rootType);
+	}
+	
 	/**
 	 * 
 	 * @param reader
@@ -195,8 +210,7 @@ public class JOOS_Lexicon {
 	 * @throws IOException
 	 */
 	public Object parse(JOOS_Reader reader, boolean isVerbose) throws JOOS_ParsingException, IOException {
-		Parser parser = new Parser(this, new StreamReader(reader), isVerbose);
-		return parser.parse();
+		return parse(reader, null, isVerbose);
 	}
 
 

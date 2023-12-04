@@ -14,6 +14,14 @@ public abstract class ParsingScope {
 	
 	protected ParsingState state;
 	
+	
+
+	public ParsingScope() {
+		super();
+	}
+
+
+
 	public abstract ScopeType getType();
 	
 

@@ -9,7 +9,7 @@ import java.util.List;
 import com.s8.core.io.joos.ParsingException;
 import com.s8.core.io.joos.composing.ComposingScope;
 import com.s8.core.io.joos.fields.PrimitivesArrayFieldHandler;
-import com.s8.core.io.joos.parsing.AlphaNumericScope;
+import com.s8.core.io.joos.parsing.StringScope;
 import com.s8.core.io.joos.parsing.ArrayScope;
 import com.s8.core.io.joos.parsing.JOOS_ParsingException;
 import com.s8.core.io.joos.parsing.ParsingScope;
@@ -57,7 +57,7 @@ public class DoubleArrayFieldHandler extends PrimitivesArrayFieldHandler {
 			
 			@Override
 			public ParsingScope openItemScope() throws JOOS_ParsingException {
-				return new AlphaNumericScope() {
+				return new StringScope() {
 					@Override
 					public void setValue(String value) throws JOOS_ParsingException, ParsingException {
 						values.add(Double.valueOf(value));
