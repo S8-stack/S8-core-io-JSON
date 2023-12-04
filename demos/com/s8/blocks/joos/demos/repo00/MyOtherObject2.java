@@ -3,8 +3,8 @@ package com.s8.blocks.joos.demos.repo00;
 import com.s8.core.io.joos.JOOS_Field;
 import com.s8.core.io.joos.JOOS_Type;
 
-@JOOS_Type(name="myOtherObject2")
-public class MyOtherObject2 {
+
+public @JOOS_Type(name="myOtherObject2") class MyOtherObject2 {
 	
 	@JOOS_Field(name="coeficients")
 	public double[] coefficients = new double[] {879, 87, 78, 98, -0.923};
