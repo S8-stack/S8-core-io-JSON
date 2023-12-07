@@ -6,10 +6,10 @@ import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 
 import com.s8.blocks.joos.demos.repo00.MyRootType;
-import com.s8.core.io.joos.JOOS_Lexicon;
-import com.s8.core.io.joos.parsing.JOOS_ParsingException;
-import com.s8.core.io.joos.types.JOOS_CompilingException;
-import com.s8.core.io.joos.utilities.JOOS_BufferedFileReader;
+import com.s8.core.io.json.JSON_Lexicon;
+import com.s8.core.io.json.parsing.JSON_ParsingException;
+import com.s8.core.io.json.types.JSON_CompilingException;
+import com.s8.core.io.json.utilities.JOOS_BufferedFileReader;
 
 
 /**
@@ -24,11 +24,11 @@ public class LaunchParsingTest {
 	 * 
 	 * @param args
 	 * @throws IOException
-	 * @throws JOOS_CompilingException
+	 * @throws JSON_CompilingException
 	 */
-	public static void main(String[] args) throws IOException, JOOS_CompilingException {
+	public static void main(String[] args) throws IOException, JSON_CompilingException {
 
-		JOOS_Lexicon context = JOOS_Lexicon.from(MyRootType.class);
+		JSON_Lexicon context = JSON_Lexicon.from(MyRootType.class);
 		
 
 		System.out.println("Go!");
@@ -47,7 +47,7 @@ public class LaunchParsingTest {
 			System.out.println(result);	
 			reader.close();
 		}
-		catch (JOOS_ParsingException e) {
+		catch (JSON_ParsingException e) {
 			e.printStackTrace();
 		}
 		finally {

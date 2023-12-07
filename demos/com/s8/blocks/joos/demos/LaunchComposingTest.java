@@ -9,15 +9,15 @@ import java.util.ArrayList;
 import com.s8.blocks.joos.demos.repo00.MyRootType;
 import com.s8.blocks.joos.demos.repo00.NewType2;
 import com.s8.blocks.joos.demos.repo00.NewType3;
-import com.s8.core.io.joos.JOOS_Lexicon;
-import com.s8.core.io.joos.composing.JOOS_ComposingException;
-import com.s8.core.io.joos.types.JOOS_CompilingException;
-import com.s8.core.io.joos.utilities.JOOS_BufferedFileWriter;
+import com.s8.core.io.json.JSON_Lexicon;
+import com.s8.core.io.json.composing.JSON_ComposingException;
+import com.s8.core.io.json.types.JSON_CompilingException;
+import com.s8.core.io.json.utilities.JOOS_BufferedFileWriter;
 
 
 public class LaunchComposingTest {
 
-	public static void main(String[] args) throws IOException, JOOS_ComposingException, JOOS_CompilingException {
+	public static void main(String[] args) throws IOException, JSON_ComposingException, JSON_CompilingException {
 
 		MyRootType root = new MyRootType();
 		root.a = 186;
@@ -44,7 +44,7 @@ public class LaunchComposingTest {
 			root.others.add(newType2);			
 		}
 
-		JOOS_Lexicon context = JOOS_Lexicon.from(MyRootType.class);
+		JSON_Lexicon context = JSON_Lexicon.from(MyRootType.class);
 		
 
 
