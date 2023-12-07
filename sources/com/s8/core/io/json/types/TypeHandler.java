@@ -68,7 +68,7 @@ public class TypeHandler {
 					constructor = type.getConstructor(new Class<?>[]{});
 				}
 				catch (NoSuchMethodException | SecurityException e) {
-					throw new RuntimeException("[Ws3dTypeHandler] No constructor for type: "+type.getName());
+					throw new JSON_CompilingException(type, "[Ws3dTypeHandler] No constructor for type: "+type.getName());
 				}
 			}
 
@@ -89,7 +89,7 @@ public class TypeHandler {
 
 					// check if already existing
 					if(fieldHandlers.get(fieldAnnotation.name())!=null){
-						throw new RuntimeException("A field is already defined with name: "+fieldAnnotation.name());
+						throw new JSON_CompilingException(type, "A field is already defined with name: "+fieldAnnotation.name());
 					}
 
 					// create field handler
