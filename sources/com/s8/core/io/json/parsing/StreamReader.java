@@ -286,6 +286,7 @@ public class StreamReader {
 
 				/* <special-characters> */
 				c == '-' || 
+				c == '+' || 
 				c == '_' || 
 				c == '.' || 
 				c == '&' || 
