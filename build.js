@@ -1,5 +1,5 @@
 const ROOT = build({
-	module: "com.s8.core.io.joos",
+	module: "com.s8.core.io.json",
 	dependencies: [],
-	target: "S8-core-io-JSON",
+	target: "S8-core-io-JSON"
 });
